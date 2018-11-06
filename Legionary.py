@@ -51,7 +51,7 @@ async def commands(ctx, *args):
     commandsEmbed.add_field(name="!members [update]",
                             value='Lists all current members.\n[update] - Updates the previous members list',
                             inline=False)
-    commandsEmbed.add_field(name="!recruit <name>", value='Recruits <@name> to the clan', inline=False)
+    commandsEmbed.add_field(name="!recruit <name>", value='Recruits <name> to the clan', inline=False)
     commandsEmbed.add_field(name="!promote <name>",
                             value='Promotes <name> one rank higher (must already be recruited)', inline=False)
     commandsEmbed.add_field(name="!remove <name>",
