@@ -7,6 +7,7 @@ from discord.ext import commands
 # Other Libraries
 import datetime
 import os
+import re
 
 bot = commands.Bot(command_prefix="!")
 
@@ -22,11 +23,8 @@ newsID = '508111231937413151'
 talkID = '463477926961348643'
 
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'Owner']
-membersMessages = ['', '', '', '', '', '']
-
-# Members lists
-folder = "./members/"
-
+legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0x2ecc71]
+membersMessages = ['', '', '', '', '', '', '']
 
 @bot.event
 async def on_ready():
@@ -60,7 +58,6 @@ async def commands(ctx, *args):
 
 @bot.command(pass_context=True)
 async def recruit(ctx, user: discord.Member):
-    # Add their name and the current date to recruitment list
     recruitName = user.display_name
     recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
 
@@ -68,10 +65,10 @@ async def recruit(ctx, user: discord.Member):
 
     await recruitUser(user)
 
-    # Add their name to the recruits file
-    recruitsFile = open(os.path.join(folder, "Recruit"), 'a+')
-    recruitsFile.write("\n" + recruitName + "\t" + recruitDate)
-    recruitsFile.close()
+    # Add their name to the members file
+    membersFile = open('Members', 'a')
+    membersFile.write("\n" + "\t" + recruitName + "\t" + recruitDate)
+    membersFile.close()
 
     await bot.send_message(ctx.message.channel,
                            "@everyone please welcome <@!%s> to the clan!" % user.id)
@@ -91,28 +88,29 @@ async def promote(ctx, user: discord.Member):
 
         # Make sure we give the higher roles their moderator statuses
         if newRoleName == 'Lieutenant' or newRoleName == 'Captain':
-            asyncio.ensure_future(bot.replace_roles(user, newRoleID, moderatorRoleID))
+            bot.replace_roles(user, newRoleID, moderatorRoleID)
         elif newRoleName == 'General':
-            asyncio.ensure_future(bot.replace_roles(user, newRoleID, globalModRoleID))
+            bot.replace_roles(user, newRoleID, globalModRoleID)
         else:
-            asyncio.ensure_future(bot.replace_roles(user, newRoleID))
+            bot.replace_roles(user, newRoleID)
 
-        # Delete entry from old rank file
-        oldRoleFile = open(os.path.join(folder, currentRole.name), "r")
-        lines = oldRoleFile.readlines()
-        oldRoleFile.close()
+        # Fetch all lines from the members file
+        membersFile = open('Members', "r")
+        lines = membersFile.readlines()
+        membersFile.close()
 
-        oldRoleFile = open(os.path.join(folder, currentRole.name), "w")
+        # Write every line except for the one being update by the new promotion
+        membersFile = open('Members', "w")
         for line in lines:
             if user.display_name not in line:
-                oldRoleFile.write(line)
-        oldRoleFile.close()
+                membersFile.write(line)
+        membersFile.close()
 
-        # Add entry to new file
-        newRoleFile = open(os.path.join(folder, newRoleName), "a+")
-        newRoleFile.write(
-            "\n" + user.display_name + "\t" + datetime.datetime.today().strftime('%m/%d/%Y'))
-        newRoleFile.close()
+        # Add the new entry to the members file
+        membersFile = open('Members', "a")
+        membersFile.write(
+            "\n" + "\t" + user.display_name + "\t" + datetime.datetime.today().strftime('%m/%d/%Y'))
+        membersFile.close()
 
         print("[Promotion] Promoted " + user.display_name + " to " + newRoleName)
 
@@ -122,98 +120,41 @@ async def promote(ctx, user: discord.Member):
 
 @bot.command(pass_context=True)
 async def members(ctx, *args):
-    recruits = {}
-    corporals = {}
-    sergeants = {}
-    lieutenants = {}
-    captains = {}
-    generals = {}
+    # The best way I could think of doing this. I know I can make it better...
 
-    for file in os.listdir(folder):
-        membersFile = open(os.path.join(folder, file), 'r')
-        line = membersFile.readline()
+    # If they want to update, get rid of the older messages
+    if args == "update":
+        for index, message in enumerate(membersMessages):
+            await bot.delete_message(membersMessages[index])
 
-        while line:
-            member = line.split()
+    for index, rank in enumerate(legionRoles):
+        membersFile = open('Members', 'r')
 
-            # If they have a multi-part name
-            if (len(member) > 2):
-                member[0] = " ".join(member[:-1])
-                member[1] = member[-1]
+        # The title of the embed is the rank name, the color is the index of colors at the rank name
+        rankEmbed = discord.Embed(title=rank, color=legionColors[legionRoles.index(rank)])
+        rankDesc = ""
 
-            if (len(member) > 0):
-                if os.path.basename(membersFile.name) == "Recruit":
-                    recruits.update({member[0]: member[1]})
-                if os.path.basename(membersFile.name) == "Corporal":
-                    corporals.update({member[0]: member[1]})
-                if os.path.basename(membersFile.name) == "Sergeant":
-                    sergeants.update({member[0]: member[1]})
-                if os.path.basename(membersFile.name) == "Lieutenant":
-                    lieutenants.update({member[0]: member[1]})
-                if os.path.basename(membersFile.name) == "Captain":
-                    captains.update({member[0]: member[1]})
-                if os.path.basename(membersFile.name) == "General":
-                    generals.update({member[0]: member[1]})
+        membersLines = membersFile.readlines()
 
-            line = membersFile.readline()
+        for line in membersLines:
+            # Split the line by tabs to get the rank, name, and date
+            lineSplit = re.split(r'\t+', line)
 
+            # Strip (chomp in perl) the last line for the newline character
+            memberRank = lineSplit[0]
+            memberName = lineSplit[1]
+            memberDate = lineSplit[2].rstrip()
+
+            # We go through each rank, rank by rank and make an embed out of it
+            if memberRank == rank:
+                rankDesc += (memberName + "\t" + memberDate + "\n")
         membersFile.close()
 
-    recruitsEmbed = discord.Embed(title="Recruits", color=0x99aab5)
-    recruitsDesc = ""
-    for name, date in recruits.items():
-        recruitsDesc += (name + "\t" + date + "\n")
-    recruitsEmbed.description = recruitsDesc
-
-    corporalsEmbed = discord.Embed(title="Corporals", color=0xf1c40f)
-    corporalsDesc = ""
-    for name, date in corporals.items():
-        corporalsDesc += (name + "\t" + date + "\n")
-    corporalsEmbed.description = corporalsDesc
-
-    sergeantsEmbed = discord.Embed(title="Sergeants", color=0xe67e22)
-    sergeantsDesc = ""
-    for name, date in sergeants.items():
-        sergeantsDesc += (name + "\t" + date + "\n")
-    sergeantsEmbed.description = sergeantsDesc
-
-    lieutenantsEmbed = discord.Embed(title="Lieutenants", color=0x9b59b6)
-    lieutenantsDesc = ""
-    for name, date in lieutenants.items():
-        lieutenantsDesc += (name + "\t" + date + "\n")
-    lieutenantsEmbed.description = lieutenantsDesc
-
-    captainsEmbed = discord.Embed(title="Captains", color=0x992d22)
-    captainsDesc = ""
-    for name, date in captains.items():
-        captainsDesc += (name + "\t" + date + "\n")
-    captainsEmbed.description = captainsDesc
-
-    generalsEmbed = discord.Embed(title="Generals", color=0x3498db)
-    generalsDesc = ""
-    for name, date in generals.items():
-        generalsDesc += (name + "\t" + date + "\n")
-    generalsEmbed.description = generalsDesc
-
-    if args == "update":
-        await bot.delete_message(membersMessages[0])
-        await bot.delete_message(membersMessages[1])
-        await bot.delete_message(membersMessages[2])
-        await bot.delete_message(membersMessages[3])
-        await bot.delete_message(membersMessages[4])
-        await bot.delete_message(membersMessages[5])
-
-    membersMessages[0] = await bot.send_message(ctx.message.channel, embed=recruitsEmbed)
-    membersMessages[1] = await bot.send_message(ctx.message.channel, embed=corporalsEmbed)
-    membersMessages[2] = await bot.send_message(ctx.message.channel, embed=sergeantsEmbed)
-    membersMessages[3] = await bot.send_message(ctx.message.channel, embed=lieutenantsEmbed)
-    membersMessages[4] = await bot.send_message(ctx.message.channel, embed=captainsEmbed)
-    membersMessages[5] = await bot.send_message(ctx.message.channel, embed=generalsEmbed)
-
+        rankEmbed.description = rankDesc
+        membersMessages[index] = await bot.send_message(ctx.message.channel, embed=rankEmbed)
 
 async def recruitUser(member):
     roleID = discord.utils.get(member.server.roles, name="Recruit")
     await bot.add_roles(member, roleID)
-
 
 bot.run(botToken)
