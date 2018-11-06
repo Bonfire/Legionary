@@ -26,6 +26,7 @@ legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'Gene
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0x2ecc71]
 membersMessages = ['', '', '', '', '', '', '']
 
+
 @bot.event
 async def on_ready():
     print('Logged in as ' + bot.user.name + ' (ID:' + bot.user.id + ') | Connected to ' + str(
@@ -36,6 +37,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(ctx):
+    # Only allow the staff to use these commands
     authorRoles = [role.name for role in ctx.author.roles]
     if 'Captain' in authorRoles or 'General' in authorRoles or 'Owner' in authorRoles:
         # Process everything else as a command
@@ -88,11 +90,11 @@ async def promote(ctx, user: discord.Member):
 
         # Make sure we give the higher roles their moderator statuses
         if newRoleName == 'Lieutenant' or newRoleName == 'Captain':
-            bot.replace_roles(user, newRoleID, moderatorRoleID)
+            await bot.add_roles(user, newRoleID, moderatorRoleID)
         elif newRoleName == 'General':
-            bot.replace_roles(user, newRoleID, globalModRoleID)
+            await bot.add_roles(user, newRoleID, globalModRoleID)
         else:
-            bot.replace_roles(user, newRoleID)
+            await bot.add_roles(user, newRoleID)
 
         # Fetch all lines from the members file
         membersFile = open('Members', "r")
@@ -109,7 +111,7 @@ async def promote(ctx, user: discord.Member):
         # Add the new entry to the members file
         membersFile = open('Members', "a")
         membersFile.write(
-            "\n" + "\t" + user.display_name + "\t" + datetime.datetime.today().strftime('%m/%d/%Y'))
+            "\n" + newRoleName + "\t" + user.display_name + "\t" + datetime.datetime.today().strftime('%m/%d/%Y'))
         membersFile.close()
 
         print("[Promotion] Promoted " + user.display_name + " to " + newRoleName)
@@ -153,8 +155,10 @@ async def members(ctx, *args):
         rankEmbed.description = rankDesc
         membersMessages[index] = await bot.send_message(ctx.message.channel, embed=rankEmbed)
 
+
 async def recruitUser(member):
     roleID = discord.utils.get(member.server.roles, name="Recruit")
     await bot.add_roles(member, roleID)
+
 
 bot.run(botToken)
