@@ -51,9 +51,9 @@ async def commands(ctx, *args):
     commandsEmbed.add_field(name="!members [update]",
                             value='Lists all current members.\n[update] - Updates the previous members list',
                             inline=False)
-    commandsEmbed.add_field(name="!recruit <@name>", value='Recruits <@name> to the clan', inline=False)
-    commandsEmbed.add_field(name="!promote <@name>",
-                            value='Promotes <@name> one rank higher (must already be recruited)', inline=False)
+    commandsEmbed.add_field(name="!recruit <name>", value='Recruits <@name> to the clan', inline=False)
+    commandsEmbed.add_field(name="!promote <name>",
+                            value='Promotes <name> one rank higher (must already be recruited)', inline=False)
 
     await bot.send_message(ctx.message.channel, embed=commandsEmbed)
 
@@ -69,7 +69,7 @@ async def recruit(ctx, user: discord.Member):
 
     # Add their name to the members file
     membersFile = open('Members', 'a')
-    membersFile.write("\n" + "\t" + recruitName + "\t" + recruitDate)
+    membersFile.write("\n" + "Recruit" + "\t" + recruitName + "\t" + recruitDate)
     membersFile.close()
 
     await bot.send_message(ctx.message.channel,
