@@ -90,11 +90,11 @@ async def promote(ctx, user: discord.Member):
 
         # Make sure we give the higher roles their moderator statuses
         if newRoleName == 'Lieutenant' or newRoleName == 'Captain':
-            await bot.add_roles(user, newRoleID, moderatorRoleID)
+            await bot.replace_roles(user, newRoleID, moderatorRoleID)
         elif newRoleName == 'General':
-            await bot.add_roles(user, newRoleID, globalModRoleID)
+            await bot.replace_roles(user, newRoleID, globalModRoleID)
         else:
-            await bot.add_roles(user, newRoleID)
+            await bot.replace_roles(user, newRoleID)
 
         # Fetch all lines from the members file
         membersFile = open('Members', "r")
