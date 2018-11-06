@@ -63,7 +63,7 @@ async def commands(ctx, *args):
 
 
 @bot.command(pass_context=True)
-async def recruit(ctx, user : discord.Member):
+async def recruit(ctx, user: discord.Member):
     recruitName = user.display_name
     recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
 
@@ -82,7 +82,7 @@ async def recruit(ctx, user : discord.Member):
 
 
 @bot.command(pass_context=True)
-async def promote(ctx, user : discord.Member):
+async def promote(ctx, user: discord.Member):
     currentRole = user.top_role
     if currentRole.name != 'Owner' and user.display_name != '@everyone':
         newRoleNumber = legionRoles.index(currentRole.name) + 1
@@ -124,11 +124,12 @@ async def promote(ctx, user : discord.Member):
         await bot.send_message(ctx.message.channel,
                                "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
+
 @bot.command(pass_context=True)
 async def remove(ctx, *args):
     removeName = args[0]
 
-    #Find their name in the members list
+    # Find their name in the members list
     membersFile = open('Members', "r")
     lines = membersFile.readlines()
     membersFile.close()
@@ -143,9 +144,10 @@ async def remove(ctx, *args):
     await bot.send_message(ctx.message.channel,
                            "%s has been removed from the files!" % removeName)
 
+
 @bot.command(pass_context=True)
-async def kick(ctx, user : discord.Member):
-    #Find their name in the members list
+async def kick(ctx, user: discord.Member):
+    # Find their name in the members list
     membersFile = open('Members', "r")
     lines = membersFile.readlines()
     membersFile.close()
@@ -162,6 +164,7 @@ async def kick(ctx, user : discord.Member):
 
     await bot.send_message(ctx.message.channel,
                            "<@!%s> has been kicked from the clan!" % user)
+
 
 @bot.command(pass_context=True)
 async def members(ctx, *args):
@@ -197,5 +200,6 @@ async def members(ctx, *args):
 
         rankEmbed.description = rankDesc
         membersMessages[index] = await bot.send_message(ctx.message.channel, embed=rankEmbed)
+
 
 bot.run(botToken)
