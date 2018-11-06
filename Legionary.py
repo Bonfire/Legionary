@@ -54,18 +54,23 @@ async def commands(ctx, *args):
     commandsEmbed.add_field(name="!recruit <name>", value='Recruits <@name> to the clan', inline=False)
     commandsEmbed.add_field(name="!promote <name>",
                             value='Promotes <name> one rank higher (must already be recruited)', inline=False)
+    commandsEmbed.add_field(name="!remove <name>",
+                            value='Removes <name> from the server files', inline=False)
+    commandsEmbed.add_field(name="!kick <name>",
+                            value='Kicks <name> from the clan (discord and server files)', inline=False)
 
     await bot.send_message(ctx.message.channel, embed=commandsEmbed)
 
 
 @bot.command(pass_context=True)
-async def recruit(ctx, user: discord.Member):
+async def recruit(ctx, user : discord.Member):
     recruitName = user.display_name
     recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
 
     print("[Recruiting] Recruiting " + user.display_name)
 
-    await recruitUser(user)
+    roleID = discord.utils.get(user.server.roles, name="Recruit")
+    await bot.add_roles(user, roleID)
 
     # Add their name to the members file
     membersFile = open('Members', 'a')
@@ -77,7 +82,7 @@ async def recruit(ctx, user: discord.Member):
 
 
 @bot.command(pass_context=True)
-async def promote(ctx, user: discord.Member):
+async def promote(ctx, user : discord.Member):
     currentRole = user.top_role
     if currentRole.name != 'Owner' and user.display_name != '@everyone':
         newRoleNumber = legionRoles.index(currentRole.name) + 1
@@ -119,6 +124,44 @@ async def promote(ctx, user: discord.Member):
         await bot.send_message(ctx.message.channel,
                                "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
+@bot.command(pass_context=True)
+async def remove(ctx, *args):
+    removeName = args[0]
+
+    #Find their name in the members list
+    membersFile = open('Members', "r")
+    lines = membersFile.readlines()
+    membersFile.close()
+
+    # Write every line down except for theirs (exclude their name, thus removing it)
+    membersFile = open('Members', "w")
+    for line in lines:
+        if removeName not in line:
+            membersFile.write(line)
+    membersFile.close()
+
+    await bot.send_message(ctx.message.channel,
+                           "%s has been removed from the files!" % removeName)
+
+@bot.command(pass_context=True)
+async def kick(ctx, user : discord.Member):
+    #Find their name in the members list
+    membersFile = open('Members', "r")
+    lines = membersFile.readlines()
+    membersFile.close()
+
+    # Write every line down except for theirs (exclude their name, thus removing it)
+    membersFile = open('Members', "w")
+    for line in lines:
+        if user.display_name not in line:
+            membersFile.write(line)
+    membersFile.close()
+
+    # Kick the player from the clan
+    await bot.kick(user)
+
+    await bot.send_message(ctx.message.channel,
+                           "<@!%s> has been kicked from the clan!" % user)
 
 @bot.command(pass_context=True)
 async def members(ctx, *args):
@@ -154,11 +197,5 @@ async def members(ctx, *args):
 
         rankEmbed.description = rankDesc
         membersMessages[index] = await bot.send_message(ctx.message.channel, embed=rankEmbed)
-
-
-async def recruitUser(member):
-    roleID = discord.utils.get(member.server.roles, name="Recruit")
-    await bot.add_roles(member, roleID)
-
 
 bot.run(botToken)
