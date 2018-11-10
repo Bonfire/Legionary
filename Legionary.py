@@ -7,13 +7,12 @@ from discord.ext import commands
 # Other Libraries
 import datetime
 import re
-
-bot = commands.Bot(command_prefix="!")
+import json
 
 # Discord Bot Token
-tokenFile = open('tokenFile', 'r')
-botToken = tokenFile.readline()
-tokenFile.close()
+from tokenFile import botToken
+
+bot = commands.Bot(command_prefix="!")
 
 # News Channel ID
 newsID = '463472622127284234'
@@ -31,7 +30,7 @@ async def on_ready():
 	print('Logged in as ' + bot.user.name + ' (ID:' + bot.user.id + ') | Connected to ' + str(
 		len(bot.servers)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
 	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
-																			   platform.python_version()))
+	                                                                           platform.python_version()))
 
 
 @bot.event
@@ -48,15 +47,20 @@ async def commands(ctx, *args):
 	commandsEmbed = discord.Embed(title="Legionary Bot Help - By Bonf", color=0xffea00)
 	commandsEmbed.description = "Type !<command> to run a command!"
 	commandsEmbed.add_field(name="!members [update]",
-							value='Lists all current members.\n[update] - Updates the previous members list',
-							inline=False)
+	                        value='Lists all current members.\n[update] - Updates the previous members list',
+	                        inline=False)
 	commandsEmbed.add_field(name="!recruit <name>", value='Recruits <name> to the clan', inline=False)
 	commandsEmbed.add_field(name="!promote <name>",
-							value='Promotes <name> one rank higher (must already be recruited)', inline=False)
+	                        value='Promotes <name> one rank higher (must already be recruited)', inline=False)
 	commandsEmbed.add_field(name="!remove <name>",
-							value='Removes <name> from the server files', inline=False)
+	                        value='Removes <name> from the server files', inline=False)
 	commandsEmbed.add_field(name="!kick <name>",
-							value='Kicks <name> from the clan (discord and server files)', inline=False)
+	                        value='Kicks <name> from the clan (discord and server files)', inline=False)
+
+	commandsEmbed.set_footer(icon_url=ctx.message.author.avatar_url,
+	                         text="Requested by {}#{} ({})".format(ctx.message.author.name,
+	                                                               ctx.message.author.discriminator,
+	                                                               ctx.message.author.id))
 
 	await bot.send_message(ctx.message.channel, embed=commandsEmbed)
 
@@ -77,7 +81,7 @@ async def recruit(ctx, user: discord.Member):
 	membersFile.close()
 
 	await bot.send_message(ctx.message.channel,
-						   "@everyone please welcome <@!%s> to the clan!" % user.id)
+	                       "@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
 @bot.command(pass_context=True)
@@ -100,28 +104,19 @@ async def promote(ctx, user: discord.Member):
 		else:
 			await bot.replace_roles(user, newRoleID)
 
-		# Fetch all lines from the members file
-		membersFile = open('Members', "r")
-		lines = membersFile.readlines()
-		membersFile.close()
+		with open('Members.json', "r") as membersFile:
+			membersList = json.load(membersFile)
 
-		# Write every line except for the one being update by the new promotion
-		membersFile = open('Members', "w")
-		for line in lines:
-			if user.display_name not in line:
-				membersFile.write(line)
-		membersFile.close()
+		del membersList[currentRole.name][user.display_name]
+		membersList[newRoleName][user.display_name] = {"date": datetime.datetime.today().strftime('%m/%d/%Y')}
 
-		# Add the new entry to the members file
-		membersFile = open('Members', "a")
-		membersFile.write(
-			"\n" + newRoleName + "\t" + user.display_name + "\t" + datetime.datetime.today().strftime('%m/%d/%Y'))
-		membersFile.close()
+		with open('Members.json', "w") as membersFile:
+			json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
 		print("[Promotion] Promoted " + user.display_name + " to " + newRoleName)
 
 		await bot.send_message(ctx.message.channel,
-							   "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
+		                       "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
 
 async def removeFromFiles(memberName):
