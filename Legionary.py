@@ -75,10 +75,12 @@ async def recruit(ctx, user: discord.Member):
 	roleID = discord.utils.get(user.server.roles, name="Recruit")
 	await bot.add_roles(user, roleID)
 
-	# Add their name to the members file
-	membersFile = open('Members', 'a')
-	membersFile.write("\n" + "Recruit" + "\t" + recruitName + "\t" + recruitDate)
-	membersFile.close()
+	with open('Members.json', "r") as membersFile:
+		membersList = json.load(membersFile)
+
+	with open('Members.json', "w") as membersFile:
+		membersList["Recruit"][recruitName] = {"date": recruitDate}
+		json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
 	await bot.send_message(ctx.message.channel,
 	                       "@everyone please welcome <@!%s> to the clan!" % user.id)
@@ -119,35 +121,31 @@ async def promote(ctx, user: discord.Member):
 		                       "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
 
-async def removeFromFiles(memberName):
-	# Find their name in the members list
-	membersFile = open('Members', "r")
-	lines = membersFile.readlines()
-	membersFile.close()
+async def removeFromFiles(topRole, memberName):
+	with open('Members.json', "r") as membersFile:
+		membersList = json.load(membersFile)
 
-	# Write every line down except for theirs (exclude their name, thus removing it)
-	membersFile = open('Members', "w")
-	for line in lines:
-		if memberName not in line:
-			membersFile.write(line)
-	membersFile.close()
+	del membersList[topRole.name][memberName]
+
+	with open('Members.json', "w") as membersFile:
+		json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
 
 @bot.command(pass_context=True)
 async def remove(ctx, user: discord.Member):
 	# Remove the player from the files
-	await removeFromFiles(user.display_name)
+	await removeFromFiles(user.top_role, user.display_name)
 	await bot.send_message(ctx.message.channel, "%s has been removed from the files!" % user.display_name)
 
 
 @bot.command(pass_context=True)
 async def kick(ctx, user: discord.Member):
 	# Remove the player from the files
-	await removeFromFiles(user.display_name)
+	await removeFromFiles(user.top_role, user.display_name)
 
 	# Kick the player from the clan
 	await bot.kick(user)
-	await bot.send_message(ctx.message.channel, "<@!%s> has been kicked from the clan!" % user)
+	await bot.send_message(ctx.message.channel, "%s has been kicked from the clan!" % user.display_name)
 
 
 @bot.command(pass_context=True)
@@ -159,28 +157,16 @@ async def members(ctx, *args):
 		for index, message in enumerate(membersMessages):
 			await bot.delete_message(membersMessages[index])
 
-	for index, rank in enumerate(legionRoles):
-		membersFile = open('Members', 'r')
+	with open('Members.json', "r") as membersFile:
+		membersList = json.load(membersFile)
 
+	for index, rank in enumerate(membersList):
 		# The title of the embed is the rank name, the color is the index of colors at the rank name
 		rankEmbed = discord.Embed(title=rank, color=legionColors[legionRoles.index(rank)])
 		rankDesc = ""
 
-		membersLines = membersFile.readlines()
-
-		for line in membersLines:
-			# Split the line by tabs to get the rank, name, and date
-			lineSplit = re.split(r'\t+', line)
-
-			# Strip (chomp in perl) the last line for the newline character
-			memberRank = lineSplit[0]
-			memberName = lineSplit[1]
-			memberDate = lineSplit[2].rstrip()
-
-			# We go through each rank, rank by rank and make an embed out of it
-			if memberRank == rank:
-				rankDesc += (memberName + "\t" + memberDate + "\n")
-		membersFile.close()
+		for member in membersList[rank]:
+			rankDesc += (member['name'] + "  -  " + member['date'] + "\n")
 
 		rankEmbed.description = rankDesc
 		membersMessages[index] = await bot.send_message(ctx.message.channel, embed=rankEmbed)
