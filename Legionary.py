@@ -49,6 +49,9 @@ async def commands(ctx, *args):
 	commandsEmbed.add_field(name="!members [update]",
 	                        value='Lists all current members.\n[update] - Updates the previous members list',
 	                        inline=False)
+	commandsEmbed.add_field(name="!names",
+	                        value='Creates and sends a file containing all member names',
+	                        inline=False)
 	commandsEmbed.add_field(name="!recruit <name>", value='Recruits <name> to the clan', inline=False)
 	commandsEmbed.add_field(name="!promote <name>",
 	                        value='Promotes <name> one rank higher (must already be recruited)', inline=False)
@@ -82,8 +85,7 @@ async def recruit(ctx, user: discord.Member):
 		membersList["Recruit"][recruitName] = {"date": recruitDate}
 		json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
-	await bot.send_message(ctx.message.channel,
-	                       "@everyone please welcome <@!%s> to the clan!" % user.id)
+	await bot.send_message(ctx.message.channel, "@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
 @bot.command(pass_context=True)
@@ -170,6 +172,20 @@ async def members(ctx, *args):
 
 		rankEmbed.description = rankDesc
 		membersMessages[index] = await bot.send_message(ctx.message.channel, embed=rankEmbed)
+
+
+@bot.command(pass_context=True)
+async def names(ctx):
+	with open('Members.json', "r") as membersFile:
+		membersList = json.load(membersFile)
+
+		with open("Names.txt", "w+") as namesFile:
+			for rank in membersList:
+				for member in membersList[rank]:
+					print(member['name'])
+					namesFile.write(member['name'] + "\n")
+		namesFile.close()
+		await bot.send_file(ctx.message.channel, "./Names.txt")
 
 
 bot.run(botToken)
