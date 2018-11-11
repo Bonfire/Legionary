@@ -16,6 +16,7 @@ bot.remove_command("help")
 
 # News Channel ID
 newsID = '463472622127284234'
+newsChannel = discord.utils.get(bot.get_all_channels(), server__name='Lost Legion', id=newsID)
 
 # Talk Channel ID
 talkID = '463477926961348643'
@@ -31,12 +32,6 @@ async def on_ready():
 		len(bot.servers)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
 	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
 	                                                                           platform.python_version()))
-
-
-@bot.event
-async def on_error(ctx):
-	print('Error encountered. Command: ' + ctx.message.contents + ', Invoker: ' + ctx.message.author.name)
-
 
 @bot.event
 async def on_message(ctx):
@@ -61,6 +56,20 @@ async def on_member_join(user: discord.Member):
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
 	await bot.send_message(user, embed=recruitmentEmbed)
+
+@bot.event
+async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
+	if oldInfo.display_name != newInfo.display_name:
+		with open('Members.json', "r") as membersFile:
+			membersList = json.load(membersFile)
+
+		with open('Members.json', "w") as membersFile:
+			lastDate = membersList[oldInfo.top_role.name][oldInfo.display_name]['date']
+			del membersList[oldInfo.top_role.name][oldInfo.display_name]
+			membersList[newInfo.top_role.name][newInfo.display_name] = {"id": newInfo.id, "date": lastDate}
+			json.dump(membersList, membersFile, indent=2, sort_keys=True)
+
+		print(oldInfo.display_name + " has changed their name to " + newInfo.display_name)
 
 
 @bot.command(pass_context=True)
@@ -116,7 +125,7 @@ async def agree(ctx):
 	invokerRoles = [role.name for role in ctx.message.author.roles]
 	if ctx.message.channel.name == 'agree':
 		await recruitUser(ctx, ctx.message.author)
-		await bot.send_message(newsID,
+		await bot.send_message(newsChannel,
 		                       "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
 
 
@@ -124,7 +133,7 @@ async def agree(ctx):
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def recruit(ctx, user: discord.Member):
 	await recruitUser(ctx, user)
-	await bot.send_message(newsID, "@everyone please welcome <@!%s> to the clan!" % user.id)
+	await bot.send_message(newsChannel, "@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
 @bot.command(pass_context=True)
@@ -160,7 +169,7 @@ async def promote(ctx, user: discord.Member):
 
 		print("[Promotion] Promoted " + user.display_name + " to " + newRoleName)
 
-		await bot.send_message(newsID,
+		await bot.send_message(newsChannel,
 		                       "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
 
