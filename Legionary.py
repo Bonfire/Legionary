@@ -33,6 +33,7 @@ async def on_ready():
 	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
 	                                                                           platform.python_version()))
 
+
 @bot.event
 async def on_message(ctx):
 	# Process all messages as commands
@@ -57,6 +58,7 @@ async def on_member_join(user: discord.Member):
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
 	await bot.send_message(user, embed=recruitmentEmbed)
 
+
 @bot.event
 async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 	if oldInfo.display_name != newInfo.display_name:
@@ -69,7 +71,23 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 			membersList[newInfo.top_role.name][newInfo.display_name] = {"id": newInfo.id, "date": lastDate}
 			json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
-		print(oldInfo.display_name + " has changed their name to " + newInfo.display_name)
+		print('[Name Change] ' + oldInfo.display_name + " has changed their name to " + newInfo.display_name)
+		await bot.send_message(newsChannel, oldInfo.display_name + " has changed their name to " + newInfo.display_name)
+
+	# This will handle all promotions, demotions, and recruitments
+	if oldInfo.top_role != newInfo.top_role:
+		with open('Members.json', "r") as membersFile:
+			membersList = json.load(membersFile)
+
+		with open('Members.json', "w") as membersFile:
+			del membersList[oldInfo.display_name][oldInfo.top_role]
+			membersList[newInfo.top_role][newInfo.display_name] = {"id": newInfo.id,
+			                                                       "date": datetime.datetime.today().strftime(
+				                                                       '%m/%d/%Y')}
+			json.dump(membersList, membersFile, indent=2, sort_keys=True)
+
+		print('[Role Change] ' + oldInfo.top_role + " had their role changed to " + newInfo.top_role)
+
 
 
 @bot.command(pass_context=True)
@@ -112,13 +130,6 @@ async def recruitUser(ctx, user: discord.Member):
 	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
 	await bot.add_roles(user, recruitRoleID)
 
-	with open('Members.json', "r") as membersFile:
-		membersList = json.load(membersFile)
-
-	with open('Members.json', "w") as membersFile:
-		membersList["Recruit"][recruitName] = {"id": recruitID, "date": recruitDate}
-		json.dump(membersList, membersFile, indent=2, sort_keys=True)
-
 
 @bot.command(pass_context=True)
 async def agree(ctx):
@@ -156,16 +167,6 @@ async def promote(ctx, user: discord.Member):
 			await bot.replace_roles(user, newRoleID, globalRoleID)
 		else:
 			await bot.replace_roles(user, newRoleID)
-
-		with open('Members.json', "r") as membersFile:
-			membersList = json.load(membersFile)
-
-		del membersList[currentRole.name][user.display_name]
-		membersList[newRoleName][user.display_name] = {"id": user.id,
-		                                               "date": datetime.datetime.today().strftime('%m/%d/%Y')}
-
-		with open('Members.json', "w") as membersFile:
-			json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
 		print("[Promotion] Promoted " + user.display_name + " to " + newRoleName)
 
