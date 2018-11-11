@@ -40,14 +40,15 @@ async def on_member_join(user: discord.Member):
 	recruitmentEmbed.description = "Thank you for showing interest in joining OS Lost Legion!\nI am a bot that will help walk you through the recruitment process\nPlease follow these steps to join:"
 
 	recruitmentEmbed.add_field(name="1. Read The Handbook",
-	                           value="Please view The Handbook located on the #handbook channel", inline=False)
+	                           value="Please view The Handbook located on the <#468933726894555136> channel",
+	                           inline=False)
 	recruitmentEmbed.add_field(name="2. Read The Requirements",
 	                           value="Read and adhere to the requirements located on The Handbook", inline=False)
 	recruitmentEmbed.add_field(name="3. Change Your Name",
 	                           value="Verify that you have changed your name on the server to your in-game name",
 	                           inline=False)
 	recruitmentEmbed.add_field(name="4. Agree to The Handbook",
-	                           value="Type \"!agree\" in the #agree channel when you have changed your name and agree to The Handbook",
+	                           value="Type \"!agree\" in the <#511061051476017152> channel when you have changed your name and agree to The Handbook",
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
 	await bot.send_message(user, embed=recruitmentEmbed)
