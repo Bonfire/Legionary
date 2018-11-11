@@ -20,6 +20,11 @@ newsID = '463472622127284234'
 # Talk Channel ID
 talkID = '463477926961348643'
 
+recruitID = '459347435378966549'
+modID = '490677812483588097'
+globalID = '460995532421070849'
+serverID = '459340406723969026'
+
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'Owner']
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0x2ecc71]
 membersMessages = ['', '', '', '', '', '', '']
@@ -32,22 +37,52 @@ async def on_ready():
 	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
 	                                                                           platform.python_version()))
 
+@bot.event
+async def on_error(ctx):
+	print('Error encountered. Command: ' + ctx.message.contents + ', Invoker: ' + ctx.message.author.name)
+
 
 @bot.event
 async def on_message(ctx):
-	# Only allow the staff to use these commands
-	authorRoles = [role.name for role in ctx.author.roles]
-	if 'Captain' in authorRoles or 'General' in authorRoles or 'Owner' in authorRoles:
-		# Process everything else as a command
-		await bot.process_commands(ctx)
+	# Process all messages as commands
+	await bot.process_commands(ctx)
+
+
+@bot.event
+async def on_member_join(user: discord.Member):
+	recruitmentEmbed = discord.Embed(title="Recruitment to OS Lost Legion", color=0xffea00)
+	recruitmentEmbed.description = "Thank you for showing interest in joining OS Lost Legion!\nI am a bot that will help walk you through the recruitment process\nPlease follow these steps to join:"
+
+	recruitmentEmbed.add_field(name="1. Read The Handbook",
+	                           value="Please view The Handbook located on the #handbook channel", inline=False)
+	recruitmentEmbed.add_field(name="2. Read The Requirements",
+	                           value="Read and adhere to the requirements located on The Handbook", inline=False)
+	recruitmentEmbed.add_field(name="3. Change Your Name",
+	                           value="Verify that you have changed your name on the server to your in-game name",
+	                           inline=False)
+	recruitmentEmbed.add_field(name="4. Agree to The Handbook",
+	                           value="Type \"!agree\" in the #agree channel when you have changed your name and agree to The Handbook",
+	                           inline=False)
+	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
+	await bot.send_message(user.id, embed=recruitmentEmbed)
 
 
 @bot.command(pass_context=True)
+async def agree(ctx):
+	await recruit(ctx, ctx.message.author)
+	await bot.send_message(ctx.message.channel, "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
+
+
+@bot.command(pass_context=True)
+@commands.has_any_role('Captain', 'General', 'Owner')
 async def commands(ctx, *args):
 	commandsEmbed = discord.Embed(title="Legionary Bot Help - By Bonf", color=0xffea00)
 	commandsEmbed.description = "Type !<command> to run a command!"
 	commandsEmbed.add_field(name="!members [update]",
 	                        value='Lists all current members.\n[update] - Updates the previous members list',
+	                        inline=False)
+	commandsEmbed.add_field(name="!agree",
+	                        value='Agrees to The Handbook and recruits the user',
 	                        inline=False)
 	commandsEmbed.add_field(name="!names",
 	                        value='Creates and sends a file containing all member names',
@@ -71,18 +106,18 @@ async def commands(ctx, *args):
 @bot.command(pass_context=True)
 async def recruit(ctx, user: discord.Member):
 	recruitName = user.display_name
+	recruitID = user.id
 	recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
 
 	print("[Recruiting] Recruiting " + user.display_name)
 
-	roleID = discord.utils.get(user.server.roles, name="Recruit")
-	await bot.add_roles(user, roleID)
+	await bot.add_roles(user, recruitID)
 
 	with open('Members.json', "r") as membersFile:
 		membersList = json.load(membersFile)
 
 	with open('Members.json', "w") as membersFile:
-		membersList["Recruit"][recruitName] = {"date": recruitDate}
+		membersList["Recruit"][recruitName] = {"id": recruitID, "date": recruitDate}
 		json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
 	await bot.send_message(ctx.message.channel, "@everyone please welcome <@!%s> to the clan!" % user.id)
@@ -97,14 +132,12 @@ async def promote(ctx, user: discord.Member):
 
 		# Remove all roles and replace with the new one
 		newRoleID = discord.utils.get(ctx.message.server.roles, name=newRoleName)
-		moderatorRoleID = discord.utils.get(ctx.message.server.roles, name="Moderator")
-		globalModRoleID = discord.utils.get(ctx.message.server.roles, name="Global Moderator")
 
 		# Make sure we give the higher roles their moderator statuses
 		if newRoleName == 'Lieutenant' or newRoleName == 'Captain':
-			await bot.replace_roles(user, newRoleID, moderatorRoleID)
+			await bot.replace_roles(user, newRoleID, modID)
 		elif newRoleName == 'General':
-			await bot.replace_roles(user, newRoleID, globalModRoleID)
+			await bot.replace_roles(user, newRoleID, globalID)
 		else:
 			await bot.replace_roles(user, newRoleID)
 
@@ -112,7 +145,8 @@ async def promote(ctx, user: discord.Member):
 			membersList = json.load(membersFile)
 
 		del membersList[currentRole.name][user.display_name]
-		membersList[newRoleName][user.display_name] = {"date": datetime.datetime.today().strftime('%m/%d/%Y')}
+		membersList[newRoleName][user.display_name] = {"id": user.id,
+		                                               "date": datetime.datetime.today().strftime('%m/%d/%Y')}
 
 		with open('Members.json', "w") as membersFile:
 			json.dump(membersList, membersFile, indent=2, sort_keys=True)

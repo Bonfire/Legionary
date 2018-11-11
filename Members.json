@@ -1,274 +1,256 @@
 {
-  "Captain": [
-    {
-      "name": "Bonf",
+  "Captain": {
+    "Bonf": {
       "id": "90533589833244672",
       "date": "10/27/2018"
     }
-  ],
-  "Corporal": [
-    {
-      "name": "266 q p",
+  },
+  "Corporal": {
+    "266 q p": {
       "id": "330228636911403009",
       "date": "10/19/2018"
     },
-    {
-      "name": "Astraios",
+    "Astraios": {
       "id": "216746280599289856",
       "date": "10/27/2018"
     },
-    {
-      "name": "Beepsky",
+    "Beepsky": {
       "id": "102156713272049664",
       "date": "10/5/2018"
     },
-    {
-      "name": "Brain Decay",
+    "Brain Decay": {
       "id": "376207508223819787",
       "date": "11/04/2018"
     },
-    {
-      "name": "Fweezy",
+    "Fweezy": {
       "id": "176448342291644419",
       "date": "7/28/2018"
     },
-    {
-      "name": "Hawtdogboy",
+    "Hawtdogboy": {
       "id": "340965356384550913",
       "date": "10/19/2018"
     },
-    {
-      "name": "MrMan5353",
+    "MrMan5353": {
       "id": "422831611470675988",
       "date": "9/22/2018"
     },
-    {
-      "name": "RakketyTam",
+    "RakketyTam": {
       "id": "264441467613741066",
       "date": "10/5/2018"
     },
-    {
-      "name": "Scum Kid",
+    "Scum Kid": {
       "id": "473302116681908245",
       "date": "9/29/2018"
     },
-    {
-      "name": "Ser Pierce",
+    "Ser Pierce": {
       "id": "241944281588170752",
       "date": "10/27/2018"
     },
-    {
-      "name": "tehl33thaxer",
+    "tehl33thaxer": {
       "id": "171509461066711041",
       "date": "10/27/2018"
     }
-  ],
-  "General": [
-    {
-      "name": "CaptDavey",
+  },
+  "General": {
+    "CaptDavey": {
       "id": "263070670425030667",
       "date": "10/28/2018"
     },
-    {
-      "name": "T0yb0x",
+    "T0yb0x": {
       "id": "269314158263009280",
       "date": "10/28/2018"
     }
-  ],
-  "Lieutenant": [
-    {
-      "name": "Arctillius",
+  },
+  "Lieutenant": {
+    "Arctillius": {
       "id": "463151435870371851",
       "date": "08/31/2018"
     },
-    {
-      "name": "Chanh",
+    "Chanh": {
       "id": "371281962377150464",
       "date": "11/04/2018"
     },
-    {
-      "name": "Honi hole",
+    "Honi hole": {
       "id": "487334965839790101",
       "date": "11/04/2018"
     },
-    {
-      "name": "KetchX",
+    "KetchX": {
       "id": "256234660206608394",
       "date": "09/22/2018"
     },
-    {
-      "name": "Volkswagens",
+    "Volkswagens": {
       "id": "147847036803219456",
       "date": "08/31/2018"
     }
-  ],
-  "Owner": [
-    {
-      "name": "EggZacht",
+  },
+  "Owner": {
+    "EggZacht": {
       "id": "450114026014507011",
       "date": "10/28/2018"
     }
-  ],
-  "Recruit": [
-    {
-      "name": "3800 V6",
+  },
+  "Recruit": {
+    "3800 V6": {
       "id": "491750246716669964",
       "date": "9/18/2018"
     },
-    {
-      "name": "Aith",
+    "Aith": {
       "id": "148551127552491520",
       "date": "11/09/2018"
     },
-    {
-      "name": "BeerMonday93",
+    "BeerMonday93": {
       "id": "423316532278460417",
       "date": "10/25/2018"
     },
-    {
-      "name": "Big Nesco",
+    "Big Nesco": {
       "id": "244921388576538634",
       "date": "10/20/2018"
     },
-    {
-      "name": "Brainlet Jed",
+    "Brainlet Jed": {
       "id": "147152001883570176",
       "date": "10/1/2018"
     },
-    {
-      "name": "Eugene1028",
+    "Eugene1028": {
       "id": "393634884234641418",
       "date": "10/22/2018"
     },
-    {
-      "name": "EyeOfTheYak",
+    "EyeOfTheYak": {
       "id": "239167756769951745",
       "date": "9/20/2018"
     },
-    {
-      "name": "FoFoFo",
+    "FoFoFo": {
       "id": "491732739318349824",
       "date": "9/18/2018"
     },
-    {
-      "name": "GetUsumKid",
+    "GetUsumKid": {
       "id": "472519485631365150",
       "date": "10/25/2018"
     },
-    {
-      "name": "Giantx",
+    "Giantx": {
       "id": "491647078683115530",
       "date": "9/18/2018"
     },
-    {
-      "name": "Gr8LakeesPk",
+    "Gr8LakeesPk": {
       "id": "451872684893143068",
       "date": "8/22/2018"
     },
-    {
-      "name": "I P00P ALOT",
+    "I P00P ALOT": {
       "id": "351589568471891968",
       "date": "9/24/2018"
     },
-    {
-      "name": "I spartacus",
+    "I spartacus": {
       "id": "490520656698671114",
       "date": "9/15/2018"
     },
-    {
-      "name": "II911PKII",
+    "II911PKII": {
       "id": "305767406905589761",
       "date": "11/2/2018"
     },
-    {
-      "name": "JuicyXp",
+    "JuicyXp": {
       "id": "457302340664295435",
       "date": "10/27/2018"
     },
-    {
-      "name": "Leckton Mate",
+    "Leckton Mate": {
       "id": "252401961364619264",
       "date": "9/25/2018"
     },
-    {
-      "name": "Lemonian",
+    "Lemonian": {
       "id": "91625508520882176",
       "date": "10/20/2018"
     },
-    {
-      "name": "MarketRSMax",
+    "MarketRSMax": {
       "id": "442020919750164530",
       "date": "11/09/2018"
     },
-    {
-      "name": "N0madic",
+    "N0madic": {
       "id": "485291795232587778",
       "date": "9/1/2018"
     },
-    {
-      "name": "OlstanAFO",
+    "OlstanAFO": {
       "id": "278522427632517131",
       "date": "9/14/2018"
     },
-    {
-      "name": "Smoke ThDrO",
+    "Smoke ThDrO": {
       "id": "505203310274412549",
       "date": "10/25/2018"
     },
-    {
-      "name": "Str illes",
+    "Str illes": {
       "id": "358431631096283136",
       "date": "11/06/2018"
     },
-    {
-      "name": "The camp wwe",
+    "The camp wwe": {
       "id": "157315168785661954",
       "date": "9/13/2018"
     },
-    {
-      "name": "Touchlightly",
+    "Touchlightly": {
       "id": "471528928738279435",
       "date": "10/1/2018"
     },
-    {
-      "name": "Waco Tx",
+    "Waco Tx": {
       "id": "210563337837084673",
       "date": "9/6/2018"
     },
-    {
-      "name": "Xway",
+    "Xway": {
       "id": "503755164012904469",
       "date": "10/21/2018"
     },
-    {
-      "name": "fyye",
+    "fyye": {
       "id": "348614010620346369",
       "date": "10/25/2018"
     },
-    {
-      "name": "iBastermaitr",
+    "iBastermaitr": {
       "id": "266613700234838016",
       "date": "10/24/2018"
     },
-    {
-      "name": "iDiscGolf",
+    "iDiscGolf": {
       "id": "278928693475409931",
       "date": "10/28/2018"
     },
-    {
-      "name": "job228",
+    "job228": {
       "id": "490547963773452309",
       "date": "9/15/2018"
     },
-    {
-      "name": "klipdrift",
+    "klipdrift": {
       "id": "445034473789325334",
       "date": "8/18/2018"
     },
-    {
-      "name": "shark gooch",
+    "shark gooch": {
       "id": "454355038282842114",
       "date": "10/29/2018"
     }
-  ]
+  },
+  "Sergeant": {
+    "I get 99s": {
+      "id": "232710455502569473",
+      "date": "7/21/18"
+    },
+    "Nova TenSoon": {
+      "id": "263875103023038475",
+      "date": "8/31/18"
+    },
+    "kaerf": {
+      "id": "334207636461322241",
+      "date": "9/22/18"
+    },
+    "LilMissRip": {
+      "id": "414282410054778881",
+      "date": "10/5/18"
+    },
+    "C9 Studly": {
+      "id": "149987271116980224",
+      "date": "10/27/18"
+    },
+    "rileyskyler0": {
+      "id": "215213172842299392",
+      "date": "10/27/18"
+    },
+    "theprimevils": {
+      "id": "313947290622623744",
+      "date": "11/4/18"
+    },
+    "brownies199": {
+      "id": "331594558578098186",
+      "date": "11/4/18"
+    }
+  }
 }
