@@ -16,7 +16,7 @@ bot.remove_command("help")
 
 # News Channel ID
 newsID = '463472622127284234'
-newsChannel = discord.utils.get(bot.get_all_channels(), server__name='Lost Legion', id=newsID)
+newsChannel = bot.get_channel(newsID)
 
 # Talk Channel ID
 talkID = '463477926961348643'
@@ -32,6 +32,7 @@ async def on_ready():
 		len(bot.servers)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
 	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
 	                                                                           platform.python_version()))
+
 
 @bot.event
 async def on_member_join(user: discord.Member):
@@ -50,6 +51,7 @@ async def on_member_join(user: discord.Member):
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
 	await bot.send_message(user, embed=recruitmentEmbed)
+
 
 @bot.event
 async def on_member_remove(user: discord.Member):
@@ -86,11 +88,12 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 		with open('Members.json', "w") as membersFile:
 			del membersList[oldInfo.top_role.name][oldInfo.display_name]
 			membersList[newInfo.top_role.name][newInfo.display_name] = {"id": newInfo.id,
-			                                                       "date": datetime.datetime.today().strftime(
-				                                                       '%m/%d/%Y')}
+			                                                            "date": datetime.datetime.today().strftime(
+				                                                            '%m/%d/%Y')}
 			json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
-		print('[Role Change] ' + oldInfo.top_role + " had their role changed to " + newInfo.top_role)
+		print('[Role Change] ' + oldInfo.display_name + " had their role changed to " + newInfo.top_role.name)
+
 
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
@@ -206,8 +209,6 @@ async def kick(ctx, user: discord.Member):
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def members(ctx, *args):
-	# The best way I could think of doing this. I know I can make it better...
-
 	# If they want to update, get rid of the older messages
 	if args == "update":
 		for index, message in enumerate(membersMessages):
