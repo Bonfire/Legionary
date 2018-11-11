@@ -6,7 +6,6 @@ from discord.ext import commands
 
 # Other Libraries
 import datetime
-import re
 import json
 
 # Discord Bot Token
