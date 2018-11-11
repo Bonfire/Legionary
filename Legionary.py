@@ -116,7 +116,7 @@ async def agree(ctx):
 	invokerRoles = [role.name for role in ctx.message.author.roles]
 	if ctx.message.channel.name == 'agree':
 		await recruitUser(ctx, ctx.message.author)
-		await bot.send_message(ctx.message.channel,
+		await bot.send_message(newsID,
 		                       "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
 
 
@@ -124,7 +124,7 @@ async def agree(ctx):
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def recruit(ctx, user: discord.Member):
 	await recruitUser(ctx, user)
-	await bot.send_message(ctx.message.channel, "@everyone please welcome <@!%s> to the clan!" % user.id)
+	await bot.send_message(newsID, "@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
 @bot.command(pass_context=True)
@@ -160,7 +160,7 @@ async def promote(ctx, user: discord.Member):
 
 		print("[Promotion] Promoted " + user.display_name + " to " + newRoleName)
 
-		await bot.send_message(ctx.message.channel,
+		await bot.send_message(newsID,
 		                       "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
 
