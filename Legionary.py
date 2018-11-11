@@ -13,17 +13,13 @@ import json
 from tokenFile import botToken
 
 bot = commands.Bot(command_prefix="!")
+bot.remove_command("help")
 
 # News Channel ID
 newsID = '463472622127284234'
 
 # Talk Channel ID
 talkID = '463477926961348643'
-
-recruitID = '459347435378966549'
-modID = '490677812483588097'
-globalID = '460995532421070849'
-serverID = '459340406723969026'
 
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'Owner']
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0x2ecc71]
@@ -36,6 +32,7 @@ async def on_ready():
 		len(bot.servers)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
 	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
 	                                                                           platform.python_version()))
+
 
 @bot.event
 async def on_error(ctx):
@@ -64,18 +61,12 @@ async def on_member_join(user: discord.Member):
 	                           value="Type \"!agree\" in the #agree channel when you have changed your name and agree to The Handbook",
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
-	await bot.send_message(user.id, embed=recruitmentEmbed)
+	await bot.send_message(user, embed=recruitmentEmbed)
 
 
 @bot.command(pass_context=True)
-async def agree(ctx):
-	await recruit(ctx, ctx.message.author)
-	await bot.send_message(ctx.message.channel, "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
-
-
-@bot.command(pass_context=True)
-@commands.has_any_role('Captain', 'General', 'Owner')
-async def commands(ctx, *args):
+@commands.has_any_role('Captain', 'Owner', 'General')
+async def help(ctx, *args):
 	commandsEmbed = discord.Embed(title="Legionary Bot Help - By Bonf", color=0xffea00)
 	commandsEmbed.description = "Type !<command> to run a command!"
 	commandsEmbed.add_field(name="!members [update]",
@@ -103,15 +94,15 @@ async def commands(ctx, *args):
 	await bot.send_message(ctx.message.channel, embed=commandsEmbed)
 
 
-@bot.command(pass_context=True)
-async def recruit(ctx, user: discord.Member):
+async def recruitUser(ctx, user: discord.Member):
 	recruitName = user.display_name
 	recruitID = user.id
 	recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
 
 	print("[Recruiting] Recruiting " + user.display_name)
 
-	await bot.add_roles(user, recruitID)
+	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
+	await bot.add_roles(user, recruitRoleID)
 
 	with open('Members.json', "r") as membersFile:
 		membersList = json.load(membersFile)
@@ -120,10 +111,25 @@ async def recruit(ctx, user: discord.Member):
 		membersList["Recruit"][recruitName] = {"id": recruitID, "date": recruitDate}
 		json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
+
+@bot.command(pass_context=True)
+async def agree(ctx):
+	invokerRoles = [role.name for role in ctx.message.author.roles]
+	if ctx.message.channel.name == 'agree':
+		await recruitUser(ctx, ctx.message.author)
+		await bot.send_message(ctx.message.channel,
+		                       "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
+
+
+@bot.command(pass_context=True)
+@commands.has_any_role('Captain', 'Owner', 'General')
+async def recruit(ctx, user: discord.Member):
+	await recruitUser(ctx, user)
 	await bot.send_message(ctx.message.channel, "@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
 @bot.command(pass_context=True)
+@commands.has_any_role('Captain', 'Owner', 'General')
 async def promote(ctx, user: discord.Member):
 	currentRole = user.top_role
 	if currentRole.name != 'Owner' and user.display_name != '@everyone':
@@ -135,9 +141,11 @@ async def promote(ctx, user: discord.Member):
 
 		# Make sure we give the higher roles their moderator statuses
 		if newRoleName == 'Lieutenant' or newRoleName == 'Captain':
-			await bot.replace_roles(user, newRoleID, modID)
+			modRoleID = discord.utils.get(ctx.message.server.roles, name="Moderator")
+			await bot.replace_roles(user, newRoleID, modRoleID)
 		elif newRoleName == 'General':
-			await bot.replace_roles(user, newRoleID, globalID)
+			globalRoleID = discord.utils.get(ctx.message.server.roles, name="Global Moderator")
+			await bot.replace_roles(user, newRoleID, globalRoleID)
 		else:
 			await bot.replace_roles(user, newRoleID)
 
@@ -168,6 +176,7 @@ async def removeFromFiles(topRole, memberName):
 
 
 @bot.command(pass_context=True)
+@commands.has_any_role('Captain', 'Owner', 'General')
 async def remove(ctx, user: discord.Member):
 	# Remove the player from the files
 	await removeFromFiles(user.top_role, user.display_name)
@@ -175,6 +184,7 @@ async def remove(ctx, user: discord.Member):
 
 
 @bot.command(pass_context=True)
+@commands.has_any_role('Captain', 'Owner', 'General')
 async def kick(ctx, user: discord.Member):
 	# Remove the player from the files
 	await removeFromFiles(user.top_role, user.display_name)
@@ -185,6 +195,7 @@ async def kick(ctx, user: discord.Member):
 
 
 @bot.command(pass_context=True)
+@commands.has_any_role('Captain', 'Owner', 'General')
 async def members(ctx, *args):
 	# The best way I could think of doing this. I know I can make it better...
 
@@ -209,6 +220,7 @@ async def members(ctx, *args):
 
 
 @bot.command(pass_context=True)
+@commands.has_any_role('Captain', 'Owner', 'General')
 async def names(ctx):
 	with open('Members.json', "r") as membersFile:
 		membersList = json.load(membersFile)
