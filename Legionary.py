@@ -51,6 +51,17 @@ async def on_member_join(user: discord.Member):
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
 	await bot.send_message(user, embed=recruitmentEmbed)
 
+@bot.event
+async def on_member_remove(user: discord.Member):
+	with open('Members.json', "r") as membersFile:
+		membersList = json.load(membersFile)
+
+	with open('Members.json', "w") as membersFile:
+		del membersList[user.top_role.name][user.display_name]
+		json.dump(membersList, membersFile, indent=2, sort_keys=True)
+
+	print('[Member Left] ' + user.display_name + ' has left the clan')
+
 
 @bot.event
 async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
@@ -73,14 +84,13 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 			membersList = json.load(membersFile)
 
 		with open('Members.json', "w") as membersFile:
-			del membersList[oldInfo.display_name][oldInfo.top_role]
-			membersList[newInfo.top_role][newInfo.display_name] = {"id": newInfo.id,
+			del membersList[oldInfo.top_role.name][oldInfo.display_name]
+			membersList[newInfo.top_role.name][newInfo.display_name] = {"id": newInfo.id,
 			                                                       "date": datetime.datetime.today().strftime(
 				                                                       '%m/%d/%Y')}
 			json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
 		print('[Role Change] ' + oldInfo.top_role + " had their role changed to " + newInfo.top_role)
-
 
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
