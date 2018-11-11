@@ -33,13 +33,6 @@ async def on_ready():
 	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
 	                                                                           platform.python_version()))
 
-
-@bot.event
-async def on_message(ctx):
-	# Process all messages as commands
-	await bot.process_commands(ctx)
-
-
 @bot.event
 async def on_member_join(user: discord.Member):
 	recruitmentEmbed = discord.Embed(title="Recruitment to OS Lost Legion", color=0xffea00)
@@ -87,7 +80,6 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 			json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
 		print('[Role Change] ' + oldInfo.top_role + " had their role changed to " + newInfo.top_role)
-
 
 
 @bot.command(pass_context=True)
@@ -167,8 +159,6 @@ async def promote(ctx, user: discord.Member):
 			await bot.replace_roles(user, newRoleID, globalRoleID)
 		else:
 			await bot.replace_roles(user, newRoleID)
-
-		print("[Promotion] Promoted " + user.display_name + " to " + newRoleName)
 
 		await bot.send_message(newsChannel,
 		                       "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
