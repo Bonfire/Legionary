@@ -96,6 +96,27 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 		print('[Role Change] ' + oldInfo.display_name + " had their role changed to " + newInfo.top_role.name)
 
 
+async def removeFromFiles(topRole, memberName):
+	with open('Members.json', "r") as membersFile:
+		membersList = json.load(membersFile)
+
+	del membersList[topRole.name][memberName]
+
+	with open('Members.json', "w") as membersFile:
+		json.dump(membersList, membersFile, indent=2, sort_keys=True)
+
+
+async def recruitUser(ctx, user: discord.Member):
+	recruitName = user.display_name
+	recruitID = user.id
+	recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
+
+	print("[Recruiting] Recruiting " + user.display_name)
+
+	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
+	await bot.add_roles(user, recruitRoleID)
+
+
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def help(ctx, *args):
@@ -124,17 +145,6 @@ async def help(ctx, *args):
 	                                                               ctx.message.author.id))
 
 	await bot.send_message(ctx.message.channel, embed=commandsEmbed)
-
-
-async def recruitUser(ctx, user: discord.Member):
-	recruitName = user.display_name
-	recruitID = user.id
-	recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
-
-	print("[Recruiting] Recruiting " + user.display_name)
-
-	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
-	await bot.add_roles(user, recruitRoleID)
 
 
 @bot.command(pass_context=True)
@@ -176,16 +186,6 @@ async def promote(ctx, user: discord.Member):
 
 		await bot.send_message(newsChannel,
 		                       "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
-
-
-async def removeFromFiles(topRole, memberName):
-	with open('Members.json', "r") as membersFile:
-		membersList = json.load(membersFile)
-
-	del membersList[topRole.name][memberName]
-
-	with open('Members.json', "w") as membersFile:
-		json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
 
 @bot.command(pass_context=True)
