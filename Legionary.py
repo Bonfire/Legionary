@@ -14,10 +14,6 @@ from tokenFile import botToken
 bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
 
-# News Channel ID
-newsID = '463472622127284234'
-newsChannel = bot.get_channel(newsID)
-
 # Talk Channel ID
 talkID = '463477926961348643'
 talkChannel = bot.get_channel(talkID)
@@ -35,15 +31,6 @@ async def removeFromFiles(topRole, memberName):
 
 	with open('Members.json', "w") as membersFile:
 		json.dump(membersList, membersFile, indent=2, sort_keys=True)
-
-
-async def recruitUser(ctx, user: discord.Member):
-	recruitName = user.display_name
-	recruitID = user.id
-	recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
-
-	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
-	await bot.add_roles(user, recruitRoleID)
 
 
 async def modLog(eventName, eventDescription, *args):
@@ -166,9 +153,11 @@ async def help(ctx, *args):
 
 @bot.command(pass_context=True)
 async def agree(ctx):
-	invokerRoles = [role.name for role in ctx.message.author.roles]
+	newsID = '463472622127284234'
+	newsChannel = bot.get_channel(newsID)
 	if ctx.message.channel.name == 'agree':
-		await recruitUser(ctx, ctx.message.author)
+		recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
+		await bot.add_roles(ctx.message.author, recruitRoleID)
 		await bot.send_message(newsChannel,
 		                       "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
 
@@ -179,13 +168,18 @@ async def agree(ctx):
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def recruit(ctx, user: discord.Member):
-	await recruitUser(ctx, user)
+	newsID = '463472622127284234'
+	newsChannel = bot.get_channel(newsID)
+	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
+	await bot.add_roles(user.id, recruitRoleID)
 	await bot.send_message(newsChannel, "@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def promote(ctx, user: discord.Member):
+	newsID = '463472622127284234'
+	newsChannel = bot.get_channel(newsID)
 	currentRole = user.top_role
 	if currentRole.name != 'Owner' and user.display_name != '@everyone':
 		newRoleNumber = legionRoles.index(currentRole.name) + 1
