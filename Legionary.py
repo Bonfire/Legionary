@@ -54,8 +54,8 @@ async def modLog(eventName, eventDescription, *args):
 	modEmbed = discord.Embed(title='Moderation Log', color=0xffea00)
 	modEmbed.add_field(name='Event: ' + eventName, value=eventDescription, inline=False)
 
-	if(len(args) > 0):
-		modEmbed.add_field(name='Link',value='[Link to Message](https://discordapp.com/channels/{}/{}/{})'.format(
+	if (len(args) > 0):
+		modEmbed.add_field(name='Link', value='[Link to Message](https://discordapp.com/channels/{}/{}/{})'.format(
 			args[0].message.server.id, args[0].message.channel.id, args[0].message.id))
 	await bot.send_message(logChannel, embed=modEmbed)
 
