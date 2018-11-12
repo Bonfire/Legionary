@@ -20,10 +20,44 @@ newsChannel = bot.get_channel(newsID)
 
 # Talk Channel ID
 talkID = '463477926961348643'
+talkChannel = bot.get_channel(talkID)
 
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'Owner']
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0x2ecc71]
 membersMessages = ['', '', '', '', '', '', '']
+
+
+async def removeFromFiles(topRole, memberName):
+	with open('Members.json', "r") as membersFile:
+		membersList = json.load(membersFile)
+
+	del membersList[topRole.name][memberName]
+
+	with open('Members.json', "w") as membersFile:
+		json.dump(membersList, membersFile, indent=2, sort_keys=True)
+
+
+async def recruitUser(ctx, user: discord.Member):
+	recruitName = user.display_name
+	recruitID = user.id
+	recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
+
+	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
+	await bot.add_roles(user, recruitRoleID)
+
+
+async def modLog(eventName, eventDescription, *args):
+	# Mod Channel ID
+	logID = '511391715027058728'
+	logChannel = bot.get_channel(logID)
+
+	modEmbed = discord.Embed(title='Moderation Log', color=0xffea00)
+	modEmbed.add_field(name='Event: ' + eventName, value=eventDescription, inline=False)
+
+	if(len(args) > 0):
+		modEmbed.add_field(name='Link',value='[Link to Message](https://discordapp.com/channels/{}/{}/{})'.format(
+			args[0].message.server.id, args[0].message.channel.id, args[0].message.id))
+	await bot.send_message(logChannel, embed=modEmbed)
 
 
 @bot.event
@@ -52,6 +86,8 @@ async def on_member_join(user: discord.Member):
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
 	await bot.send_message(user, embed=recruitmentEmbed)
+	await modLog("Join",
+	             "<@!{}> has joined the server. A recruitment message has been sent.".format(user.id))
 
 
 @bot.event
@@ -63,7 +99,7 @@ async def on_member_remove(user: discord.Member):
 		del membersList[user.top_role.name][user.display_name]
 		json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
-	print('[Member Left] ' + user.display_name + ' has left the clan')
+	await modLog("Leave", "<@!{}> has left the server".format(user.id))
 
 
 @bot.event
@@ -78,8 +114,8 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 			membersList[newInfo.top_role.name][newInfo.display_name] = {"id": newInfo.id, "date": lastDate}
 			json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
-		print('[Name Change] ' + oldInfo.display_name + " has changed their name to " + newInfo.display_name)
-		await bot.send_message(newsChannel, oldInfo.display_name + " has changed their name to " + newInfo.display_name)
+		await modLog("Name Change",
+		             "{} has changed their name to <@!{}>".format(oldInfo.display_name, newInfo.id))
 
 	# This will handle all promotions, demotions, and recruitments
 	if oldInfo.top_role != newInfo.top_role:
@@ -93,28 +129,9 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 				                                                            '%m/%d/%Y')}
 			json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
-		print('[Role Change] ' + oldInfo.display_name + " had their role changed to " + newInfo.top_role.name)
-
-
-async def removeFromFiles(topRole, memberName):
-	with open('Members.json', "r") as membersFile:
-		membersList = json.load(membersFile)
-
-	del membersList[topRole.name][memberName]
-
-	with open('Members.json', "w") as membersFile:
-		json.dump(membersList, membersFile, indent=2, sort_keys=True)
-
-
-async def recruitUser(ctx, user: discord.Member):
-	recruitName = user.display_name
-	recruitID = user.id
-	recruitDate = datetime.datetime.today().strftime('%m/%d/%Y')
-
-	print("[Recruiting] Recruiting " + user.display_name)
-
-	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
-	await bot.add_roles(user, recruitRoleID)
+		await modLog("Rank Change",
+		             "<@!{}> had their rank changed from {} to {}".format(oldInfo.id, oldInfo.top_role.name,
+		                                                                  newInfo.top_role.name))
 
 
 @bot.command(pass_context=True)
@@ -140,11 +157,11 @@ async def help(ctx, *args):
 	                        value='Kicks <name> from the clan (discord and server files)', inline=False)
 
 	commandsEmbed.set_footer(icon_url=ctx.message.author.avatar_url,
-	                         text="Requested by {}#{} ({})".format(ctx.message.author.name,
-	                                                               ctx.message.author.discriminator,
-	                                                               ctx.message.author.id))
+	                         text="Requested by <@!{}>".format(ctx.message.author.id))
 
 	await bot.send_message(ctx.message.channel, embed=commandsEmbed)
+	await modLog("Help",
+	             "<@!{}> has requested the commands list".format(ctx.message.author.id), ctx)
 
 
 @bot.command(pass_context=True)
@@ -154,6 +171,9 @@ async def agree(ctx):
 		await recruitUser(ctx, ctx.message.author)
 		await bot.send_message(newsChannel,
 		                       "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
+
+		await modLog("Agreement",
+		             "<@!{}> has agreed to the handbook".format(ctx.message.author.id), ctx)
 
 
 @bot.command(pass_context=True)
@@ -187,13 +207,18 @@ async def promote(ctx, user: discord.Member):
 		await bot.send_message(newsChannel,
 		                       "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
+		await modLog("Promotion",
+		             "<@!{}> was promoted to {} by {}".format(user.id, user.top_role,
+		                                                      ctx.message.author.display_name), ctx)
+
 
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def remove(ctx, user: discord.Member):
 	# Remove the player from the files
 	await removeFromFiles(user.top_role, user.display_name)
-	await bot.send_message(ctx.message.channel, "%s has been removed from the files!" % user.display_name)
+	await modLog("Remove",
+	             "{} was removed from the server files".format(user.display_name), ctx)
 
 
 @bot.command(pass_context=True)
@@ -204,7 +229,8 @@ async def kick(ctx, user: discord.Member):
 
 	# Kick the player from the clan
 	await bot.kick(user)
-	await bot.send_message(ctx.message.channel, "%s has been kicked from the clan!" % user.display_name)
+	await modLog("Kick",
+	             "{} was removed from the server files and kicked".format(user.display_name), ctx)
 
 
 @bot.command(pass_context=True)
@@ -224,10 +250,13 @@ async def members(ctx, *args):
 		rankDesc = ""
 
 		for member in membersList[rank]:
-			rankDesc += (member['name'] + "  -  " + member['date'] + "\n")
+			rankDesc += (member + "  -  " + membersList[rank][member]['date'] + "\n")
 
 		rankEmbed.description = rankDesc
 		membersMessages[index] = await bot.send_message(ctx.message.channel, embed=rankEmbed)
+
+	await modLog("Members List",
+	             "<@!{}> has requested the members list".format(ctx.message.author.id), ctx)
 
 
 @bot.command(pass_context=True)
@@ -243,6 +272,9 @@ async def names(ctx):
 					namesFile.write(member['name'] + "\n")
 		namesFile.close()
 		await bot.send_file(ctx.message.channel, "./Names.txt")
+
+		await modLog("Names",
+		             "<@!{}> has requested the names list".format(ctx.message.author.id), ctx)
 
 
 bot.run(botToken)
