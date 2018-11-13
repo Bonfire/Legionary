@@ -110,7 +110,10 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 			membersList = json.load(membersFile)
 
 		with open('Members.json', "w") as membersFile:
-			del membersList[oldInfo.top_role.name][oldInfo.display_name]
+			# No entry exists for new recruits, so we need this check
+			if oldInfo.top_role.name != '@everyone':
+				del membersList[oldInfo.top_role.name][oldInfo.display_name]
+
 			membersList[newInfo.top_role.name][newInfo.display_name] = {"id": newInfo.id,
 			                                                            "date": datetime.datetime.today().strftime(
 				                                                            '%m/%d/%Y')}
