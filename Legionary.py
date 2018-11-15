@@ -71,7 +71,7 @@ async def on_member_join(user: discord.Member):
 	recruitmentEmbed.add_field(name="4. Agree to The Handbook",
 	                           value="Type \"!agree\" in the <#511061051476017152> channel when you have changed your name and agree to The Handbook",
 	                           inline=False)
-	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our discord server!")
+	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
 	await bot.send_message(user, embed=recruitmentEmbed)
 	await modLog("Join",
 	             "<@!{}> has joined the server. A recruitment message has been sent.".format(user.id))
@@ -92,17 +92,18 @@ async def on_member_remove(user: discord.Member):
 @bot.event
 async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 	if oldInfo.display_name != newInfo.display_name:
-		with open('Members.json', "r") as membersFile:
-			membersList = json.load(membersFile)
+		if oldInfo.top_role.name != '@everyone':
+			with open('Members.json', "r") as membersFile:
+				membersList = json.load(membersFile)
 
-		with open('Members.json', "w") as membersFile:
-			lastDate = membersList[oldInfo.top_role.name][oldInfo.display_name]['date']
-			del membersList[oldInfo.top_role.name][oldInfo.display_name]
-			membersList[newInfo.top_role.name][newInfo.display_name] = {"id": newInfo.id, "date": lastDate}
-			json.dump(membersList, membersFile, indent=2, sort_keys=True)
+			with open('Members.json', "w") as membersFile:
+				lastDate = membersList[oldInfo.top_role.name][oldInfo.display_name]['date']
+				del membersList[oldInfo.top_role.name][oldInfo.display_name]
+				membersList[newInfo.top_role.name][newInfo.display_name] = {"id": newInfo.id, "date": lastDate}
+				json.dump(membersList, membersFile, indent=2, sort_keys=True)
 
-		await modLog("Name Change",
-		             "{} has changed their name to <@!{}>".format(oldInfo.display_name, newInfo.id))
+			await modLog("Name Change",
+			             "{} has changed their name to <@!{}>".format(oldInfo.display_name, newInfo.id))
 
 	# This will handle all promotions, demotions, and recruitments
 	if oldInfo.top_role != newInfo.top_role:
