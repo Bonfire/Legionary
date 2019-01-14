@@ -15,7 +15,7 @@ bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
 
 # Talk Channel ID
-talkID = '463477926961348643'
+talkID = '515684256400277520'
 talkChannel = bot.get_channel(talkID)
 
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'Owner']
@@ -35,7 +35,7 @@ async def removeFromFiles(topRole, memberName):
 
 async def modLog(eventName, eventDescription, *args):
 	# Mod Channel ID
-	logID = '511391715027058728'
+	logID = '515702280063025171'
 	logChannel = bot.get_channel(logID)
 
 	modEmbed = discord.Embed(title='Moderation Log', color=0xffea00)
@@ -157,7 +157,7 @@ async def help(ctx, *args):
 
 @bot.command(pass_context=True)
 async def agree(ctx):
-	newsID = '463472622127284234'
+	newsID = '515684275580960769'
 	newsChannel = bot.get_channel(newsID)
 	if ctx.message.channel.name == 'agree':
 		recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
@@ -172,7 +172,7 @@ async def agree(ctx):
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def recruit(ctx, user: discord.Member):
-	newsID = '463472622127284234'
+	newsID = '515684275580960769'
 	newsChannel = bot.get_channel(newsID)
 	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
 	await bot.add_roles(user.id, recruitRoleID)
@@ -182,7 +182,7 @@ async def recruit(ctx, user: discord.Member):
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def promote(ctx, user: discord.Member):
-	newsID = '463472622127284234'
+	newsID = '515684275580960769'
 	newsChannel = bot.get_channel(newsID)
 	currentRole = user.top_role
 	if currentRole.name != 'Owner' and user.display_name != '@everyone':
@@ -260,14 +260,10 @@ async def members(ctx, *args):
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def names(ctx):
-	with open('Members.json', "r") as membersFile:
-		membersList = json.load(membersFile)
-
 		with open("Names.txt", "w+") as namesFile:
-			for rank in membersList:
-				for member in membersList[rank]:
-					print(member['name'])
-					namesFile.write(member['name'] + "\n")
+			members = ctx.message.server.members
+			for person in members:
+				namesFile.write(person.display_name + "\n")
 		namesFile.close()
 		await bot.send_file(ctx.message.channel, "./Names.txt")
 
