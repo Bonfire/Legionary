@@ -7,6 +7,9 @@ from discord.ext import commands
 # Discord Bot Token
 from tokenFile import botToken
 
+# Requests library for web requests
+import requests
+
 bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
 
@@ -18,9 +21,11 @@ legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'Gene
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0x2ecc71]
 membersMessages = ['', '', '', '', '', '', '']
 
+# Stat names
+statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 'Prayer', 'Magic', 'Cooking', 'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore', 'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
+
 # Members list of dictionaries
 membersList = []
-
 
 @bot.event
 async def on_ready():
@@ -281,5 +286,24 @@ async def names(ctx):
 	await modLog("Names",
 	             "<@!{}> has requested the names list".format(ctx.message.author.id), ctx)
 
+@bot.command(pass_context=True)
+async def stats(ctx, player):
+	"""Will display a list of a player's stats"""
+
+	hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + player)
+	separatedStats = hiscoreLookup.text.split("\n")
+	print(separatedStats)
+
+	statEmbed = discord.Embed(title="Stats for " + player, color=0x2ecc71)
+
+	statDesc = "Stats for {}".format(player) + "\n (Level, XP) \n"
+	for stat in range(0,23):
+		statName = statNames[stat]
+		statLevel = separatedStats[stat].split(",")[1]
+		statXP = separatedStats[stat].split(",")[2]
+		statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
+
+	statEmbed.description = statDesc
+	await bot.send_message(ctx.message.channel, embed=statEmbed)
 
 bot.run(botToken)
