@@ -290,20 +290,23 @@ async def names(ctx):
 async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
-	hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
-	separatedStats = hiscoreLookup.text.split("\n")
-	print(separatedStats)
+	if ctx.message.channel.id == "516433581992706058":
+		hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
+		separatedStats = hiscoreLookup.text.split("\n")
+		print(separatedStats)
 
-	statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
+		statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
 
-	statDesc = "Stats for {}".format(message) + "\n (Level, XP) \n"
-	for stat in range(0,23):
-		statName = statNames[stat]
-		statLevel = separatedStats[stat].split(",")[1]
-		statXP = separatedStats[stat].split(",")[2]
-		statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
+		statDesc = "Stats for {}".format(message) + "\n (Level, XP) \n"
+		for stat in range(0,23):
+			statName = statNames[stat]
+			statLevel = separatedStats[stat].split(",")[1]
+			statXP = separatedStats[stat].split(",")[2]
+			statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
 
-	statEmbed.description = statDesc
-	await bot.send_message(ctx.message.channel, embed=statEmbed)
+		statEmbed.description = statDesc
+		await bot.send_message(ctx.message.channel, embed=statEmbed)
+	else:
+		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(bot.get_channel("516433581992706058").mention))
 
 bot.run(botToken)
