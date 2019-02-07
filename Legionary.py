@@ -287,16 +287,16 @@ async def names(ctx):
 	             "<@!{}> has requested the names list".format(ctx.message.author.id), ctx)
 
 @bot.command(pass_context=True)
-async def stats(ctx, player):
+async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
-	hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + player)
+	hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
 	separatedStats = hiscoreLookup.text.split("\n")
 	print(separatedStats)
 
-	statEmbed = discord.Embed(title="Stats for " + player, color=0x2ecc71)
+	statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
 
-	statDesc = "Stats for {}".format(player) + "\n (Level, XP) \n"
+	statDesc = "Stats for {}".format(message) + "\n (Level, XP) \n"
 	for stat in range(0,23):
 		statName = statNames[stat]
 		statLevel = separatedStats[stat].split(",")[1]
