@@ -1,5 +1,6 @@
 # For Legion Discord Bot
 import platform
+import math
 
 import discord
 from discord.ext import commands
@@ -9,6 +10,9 @@ from tokenFile import botToken
 
 # Requests library for web requests
 import requests
+
+# Web Scraping library
+from lxml import html
 
 bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
@@ -308,5 +312,29 @@ async def stats(ctx, *, message: str):
 		await bot.send_message(ctx.message.channel, embed=statEmbed)
 	else:
 		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(bot.get_channel("516433581992706058").mention))
+
+@bot.command(pass_context=True)
+async def hcim(ctx, *, message: str):
+	"""Will look up, add or remove HCIM player tracking"""
+
+	hcimLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
+	separatedStats = hcimLookup.text.split("\n")
+	overallScore = int(separatedStats[0].split(",")[0])
+	scorePageNum = math.ceil(overallScore / 25)
+
+	scorePageHTML = requests.get("https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(scorePageNum)).content
+	scorePageTree = html.fromstring(scorePageHTML)
+
+	playerScores = scorePageTree.xpath('//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
+
+	if message in playerScores:
+		HCIMStatusEmbed = statEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
+		HCIMStatusEmbed.description = "Player is dead!"
+		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
+	else:
+		HCIMStatusEmbed = statEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
+		HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(overallScore)
+		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
+
 
 bot.run(botToken)
