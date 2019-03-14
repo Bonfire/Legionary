@@ -132,7 +132,7 @@ async def on_member_join(user: discord.Member):
 	                           value="Verify that you have changed your name on the server to your in-game name",
 	                           inline=False)
 	recruitmentEmbed.add_field(name="4. Agree to The Handbook",
-	                           value="Type \"!agree\" in the <#511061051476017152> channel when you have changed your name and agree to The Handbook",
+	                           value="Type \"!agree\" in the <#515688016207937585> channel when you have changed your name and agree to The Handbook",
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
 	await bot.send_message(user, embed=recruitmentEmbed)
