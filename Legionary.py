@@ -324,20 +324,24 @@ async def hcim(ctx, *, message: str):
 	hcimLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
 	separatedStats = hcimLookup.text.split("\n")
 	overallScore = int(separatedStats[0].split(",")[0])
+	skillTotal = int(separatedStats[0].split(",")[1])
 	scorePageNum = math.ceil(overallScore / 25)
 
 	scorePageHTML = requests.get("https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(scorePageNum)).content
 	scorePageTree = html.fromstring(scorePageHTML)
 
 	playerScores = scorePageTree.xpath('//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
+	playerScores = [name.replace('\xa0',' ') for name in playerScores]
 
 	if message in playerScores:
-		HCIMStatusEmbed = statEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
-		HCIMStatusEmbed.description = "Player is dead!"
+		HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
+		HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "\n"
+		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(" ", "%20") + ")"
 		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
 	else:
-		HCIMStatusEmbed = statEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
-		HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(overallScore)
+		HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
+		HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(overallScore) + ", skill total of " + str(skillTotal) + "\n"
+		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(" ", "%20") + ")"
 		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
 
 
