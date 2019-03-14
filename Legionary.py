@@ -282,7 +282,11 @@ async def names(ctx):
 	with open("Names.txt", "w+") as namesFile:
 		members = ctx.message.server.members
 		for person in members:
-			if person.display_name != "Groovy" and person.display_name != "Legionary":
+			if person.display_name != "Groovy" \
+					and person.display_name != "Legionary" \
+					and person.display_name != "Twisty Bot" \
+					and person.top_role.name != "Guest"\
+					and person.top_role.name != "@everyone":
 				namesFile.write(person.display_name + "\n")
 	namesFile.close()
 	await bot.send_file(ctx.message.channel, "./Names.txt")
