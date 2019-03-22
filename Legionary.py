@@ -372,6 +372,7 @@ async def hcim(ctx, *, message: str):
 		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
 			bot.get_channel("516433581992706058").mention))
 
+
 class lendObject:
 	"""LendObject class that represents one lend offer/request"""
 	lender = None
@@ -489,5 +490,6 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 	else:
 		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
 			bot.get_channel("558534286681178132").mention))
+
 
 bot.run(botToken)
