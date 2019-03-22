@@ -338,37 +338,39 @@ async def stats(ctx, *, message: str):
 @bot.command(pass_context=True)
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
+	if ctx.message.channel.id == "516433581992706058":
+		hcimLookup = requests.get(
+			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
+		separatedStats = hcimLookup.text.split("\n")
+		overallScore = int(separatedStats[0].split(",")[0])
+		skillTotal = int(separatedStats[0].split(",")[1])
+		scorePageNum = math.ceil(overallScore / 25)
 
-	hcimLookup = requests.get(
-		"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
-	separatedStats = hcimLookup.text.split("\n")
-	overallScore = int(separatedStats[0].split(",")[0])
-	skillTotal = int(separatedStats[0].split(",")[1])
-	scorePageNum = math.ceil(overallScore / 25)
+		scorePageHTML = requests.get(
+			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(
+				scorePageNum)).content
+		scorePageTree = html.fromstring(scorePageHTML)
 
-	scorePageHTML = requests.get(
-		"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(
-			scorePageNum)).content
-	scorePageTree = html.fromstring(scorePageHTML)
+		playerScores = scorePageTree.xpath(
+			'//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
+		playerScores = [name.replace('\xa0', ' ') for name in playerScores]
 
-	playerScores = scorePageTree.xpath(
-		'//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
-	playerScores = [name.replace('\xa0', ' ') for name in playerScores]
-
-	if message in playerScores:
-		HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
-		HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "\n"
-		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
-			" ", "%20") + ")"
-		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
+		if message in playerScores:
+			HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
+			HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "\n"
+			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
+				" ", "%20") + ")"
+			await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
+		else:
+			HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
+			HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
+				overallScore) + ", skill total of " + str(skillTotal) + "\n"
+			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
+				" ", "%20") + ")"
+			await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
 	else:
-		HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
-		HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
-			overallScore) + ", skill total of " + str(skillTotal) + "\n"
-		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
-			" ", "%20") + ")"
-		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
-
+		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
+			bot.get_channel("516433581992706058").mention))
 
 class lendObject:
 	"""LendObject class that represents one lend offer/request"""
@@ -390,102 +392,102 @@ class lendObject:
 async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList: str = None, lendTime: str = None):
 	"""Allows members to lend, confirm, and return items to other users"""
 
-	# lendID = '515702280063025171'
-	# lendChannel = bot.get_channel(lendID)
+	if ctx.message.channel.id == "558534286681178132":
+		if "offer" in keyword:
+			if lendeeMember is not None and itemList is not None and lendTime is not None:
+				lendingMember = ctx.message.author
 
-	if "offer" in keyword:
-		if lendeeMember is not None and itemList is not None and lendTime is not None:
-			lendingMember = ctx.message.author
+				if lendeeMember is not lendingMember:
+					lendEmbed = discord.Embed(
+						title="Lend Offer from " + lendingMember.display_name + " to " + lendeeMember.display_name,
+						color=0xffd700)
+					lendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+					lendEmbed.add_field(name="Lender", value=lendingMember.mention, inline=False)
+					lendEmbed.add_field(name="Lendee", value=lendeeMember.mention, inline=False)
+					lendEmbed.add_field(name="Items", value=itemList, inline=False)
+					lendEmbed.add_field(name="Time", value=lendTime, inline=False)
+					lendEmbed.add_field(name="Status", value="Pending", inline=False)
 
-			if lendeeMember is not lendingMember:
-				lendEmbed = discord.Embed(
-					title="Lend Offer from " + lendingMember.display_name + " to " + lendeeMember.display_name,
-					color=0xffd700)
-				lendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-				lendEmbed.add_field(name="Lender", value=lendingMember.mention, inline=False)
-				lendEmbed.add_field(name="Lendee", value=lendeeMember.mention, inline=False)
-				lendEmbed.add_field(name="Items", value=itemList, inline=False)
-				lendEmbed.add_field(name="Time", value=lendTime, inline=False)
-				lendEmbed.add_field(name="Status", value="Pending", inline=False)
+					lendList.append(lendObject(lendingMember, lendeeMember, itemList, lendTime, False))
 
-				lendList.append(lendObject(lendingMember, lendeeMember, itemList, lendTime, False))
-
-				await bot.send_message(ctx.message.channel, embed=lendEmbed)
+					await bot.send_message(ctx.message.channel, embed=lendEmbed)
+				else:
+					await bot.send_message(ctx.message.channel, "You cannot lend an item to yourself!")
 			else:
-				await bot.send_message(ctx.message.channel, "You cannot lend an item to yourself!")
+				await bot.send_message(ctx.message.channel,
+				                       "Missing required parameters: `!lend offer [lendee] [items] [time]`")
+		elif "confirm" in keyword or "accept" in keyword:
+			for lend in lendList:
+				if lend.lendee is ctx.message.author and lend.accepted == False:
+					lend.accepted = True
+
+					acceptedLendEmbed = discord.Embed(
+						title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " accepted",
+						color=0x00ff00)
+					acceptedLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+					acceptedLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
+					acceptedLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
+					acceptedLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
+					acceptedLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
+					acceptedLendEmbed.add_field(name="Status", value="Accepted", inline=False)
+
+					await bot.send_message(ctx.message.channel, embed=acceptedLendEmbed)
+
+					break
+		elif "decline" in keyword:
+			for lend in lendList:
+				if lend.lendee is ctx.message.author and lend.accepted == False:
+					declinedLendEmbed = discord.Embed(
+						title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " declined",
+						color=0xff0000)
+					declinedLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+					declinedLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
+					declinedLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
+					declinedLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
+					declinedLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
+					declinedLendEmbed.add_field(name="Status", value="Declined", inline=False)
+
+					lendList.remove(lend)
+					del lend
+
+					await bot.send_message(ctx.message.channel, embed=declinedLendEmbed)
+		elif "rescind" in keyword:
+			for lend in lendList:
+				if lend.lender is ctx.message.author and lend.accepted == False:
+					rescindLendEmbed = discord.Embed(
+						title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " rescinded",
+						color=0xff0000)
+					rescindLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+					rescindLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
+					rescindLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
+					rescindLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
+					rescindLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
+					rescindLendEmbed.add_field(name="Status", value="Rescinded", inline=False)
+
+					lendList.remove(lend)
+					del lend
+
+					await bot.send_message(ctx.message.channel, embed=rescindLendEmbed)
+		elif "list" in keyword:
+			messageBuild = "```\n"
+
+			for index, lend in reversed(list(enumerate(lendList))):
+				if lend.lender is lendeeMember or lend.lendee is lendeeMember and lend.accepted == True:
+					messageBuild += str((len(
+						lendList) - index)) + ". Lender: " + lend.lender.display_name + ", Lendee: " + lend.lendee.display_name + ", Items: " + lend.itemList + "\n"
+
+			messageBuild += "```"
+
+			if lendeeMember.display_name in messageBuild:
+				await bot.send_message(ctx.message.channel,
+				                       "25 most recent lends for " + lendeeMember.mention + "\n" + messageBuild)
+			else:
+				await bot.send_message(ctx.message.channel, "No recent lends found for" + lendeeMember.mention)
 		else:
 			await bot.send_message(ctx.message.channel,
-			                       "Missing required parameters: `!lend offer [lendee] [items] [time]`")
-	elif "confirm" in keyword or "accept" in keyword:
-		for lend in lendList:
-			if lend.lendee is ctx.message.author and lend.accepted == False:
-				lend.accepted = True
-
-				acceptedLendEmbed = discord.Embed(
-					title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " accepted",
-					color=0x00ff00)
-				acceptedLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-				acceptedLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
-				acceptedLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
-				acceptedLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
-				acceptedLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
-				acceptedLendEmbed.add_field(name="Status", value="Accepted", inline=False)
-
-				await bot.send_message(ctx.message.channel, embed=acceptedLendEmbed)
-
-				break
-	elif "decline" in keyword:
-		for lend in lendList:
-			if lend.lendee is ctx.message.author and lend.accepted == False:
-				declinedLendEmbed = discord.Embed(
-					title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " declined",
-					color=0xff0000)
-				declinedLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-				declinedLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
-				declinedLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
-				declinedLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
-				declinedLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
-				declinedLendEmbed.add_field(name="Status", value="Declined", inline=False)
-
-				lendList.remove(lend)
-				del lend
-
-				await bot.send_message(ctx.message.channel, embed=declinedLendEmbed)
-	elif "rescind" in keyword:
-		for lend in lendList:
-			if lend.lender is ctx.message.author and lend.accepted == False:
-				rescindLendEmbed = discord.Embed(
-					title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " rescinded",
-					color=0xff0000)
-				rescindLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-				rescindLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
-				rescindLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
-				rescindLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
-				rescindLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
-				rescindLendEmbed.add_field(name="Status", value="Rescinded", inline=False)
-
-				lendList.remove(lend)
-				del lend
-
-				await bot.send_message(ctx.message.channel, embed=rescindLendEmbed)
-	elif "list" in keyword:
-		messageBuild = "```\n"
-
-		for index, lend in reversed(list(enumerate(lendList))):
-			if lend.lender is lendeeMember or lend.lendee is lendeeMember and lend.accepted == True:
-				messageBuild += str((len(
-					lendList) - index)) + ". Lender: " + lend.lender.display_name + ", Lendee: " + lend.lendee.display_name + ", Items: " + lend.itemList + "\n"
-
-		messageBuild += "```"
-
-		if lendeeMember.display_name in messageBuild:
-			await bot.send_message(ctx.message.channel,
-			                       "25 most recent lends for " + lendeeMember.mention + "\n" + messageBuild)
-		else:
-			await bot.send_message(ctx.message.channel, "No recent lends found for" + lendeeMember.mention)
+			                       "Lend keyword not understood! Try `!lend [offer/confirm/decline/rescind/list]`")
 	else:
-		await bot.send_message(ctx.message.channel,
-		                       "Lend keyword not understood! Try `!lend [offer/confirm/decline/rescind/list]`")
-
+		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
+			bot.get_channel("558534286681178132").mention))
 
 bot.run(botToken)
