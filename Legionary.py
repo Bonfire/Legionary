@@ -301,7 +301,6 @@ async def stats(ctx, *, message: str):
 	if ctx.message.channel.id == "516433581992706058":
 		hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
 		separatedStats = hiscoreLookup.text.split("\n")
-		print(separatedStats)
 
 		statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
 
@@ -344,5 +343,24 @@ async def hcim(ctx, *, message: str):
 		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(" ", "%20") + ")"
 		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
 
+@bot.command(pass_context=True)
+async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList: str = None, lendTime: str = None):
+	"""Allows members to lend, confirm, and return items to other users"""
+
+	# lendID = '515702280063025171'
+	# lendChannel = bot.get_channel(lendID)
+
+	if lendeeMember is not None and itemList is not None and lendTime is not None:
+		lendingMember = ctx.message.author
+
+		lendEmbed = discord.Embed(title="Lend Offer from " + lendingMember.name + " to " + lendeeMember.name, color=0xffd700)
+		lendEmbed.add_field(name="Lender", value=lendingMember.mention, inline=False)
+		lendEmbed.add_field(name="Lendee", value=lendeeMember.mention, inline=False)
+		lendEmbed.add_field(name="Items", value=itemList, inline=False)
+		lendEmbed.add_field(name="Time", value=lendTime, inline=False)
+
+		await bot.send_message(ctx.message.channel, embed=lendEmbed)
 
 bot.run(botToken)
+
+
