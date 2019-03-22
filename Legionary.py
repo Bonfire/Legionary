@@ -401,14 +401,13 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 
 				lendList.append(lendObject(lendingMember, lendeeMember, itemList, lendTime, False))
 
-				print(lendList)
-
 				await bot.send_message(ctx.message.channel, embed=lendEmbed)
 			else:
 				await bot.send_message(ctx.message.channel, "You cannot lend an item to yourself!")
 		else:
-			await bot.send_message(ctx.message.channel, "Missing required parameters: `!lend offer [lendee] [items] [time]`")
-	elif "confirm" in keyword:
+			await bot.send_message(ctx.message.channel,
+			                       "Missing required parameters: `!lend offer [lendee] [items] [time]`")
+	elif "confirm" in keyword or "accept" in keyword:
 		for lend in lendList:
 			if lend.lendee is ctx.message.author and lend.accepted == False:
 				lend.accepted = True
@@ -442,8 +441,6 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 				lendList.remove(lend)
 				del lend
 
-				print(lendList)
-
 				await bot.send_message(ctx.message.channel, embed=declinedLendEmbed)
 	elif "rescind" in keyword:
 		for lend in lendList:
@@ -461,10 +458,25 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 				lendList.remove(lend)
 				del lend
 
-				print(lendList)
-
 				await bot.send_message(ctx.message.channel, embed=rescindLendEmbed)
+	elif "list" in keyword:
+		messageBuild = "```\n"
+
+		for index, lend in reversed(list(enumerate(lendList))):
+			if lend.lender is lendeeMember or lend.lendee is lendeeMember and lend.accepted == True:
+				messageBuild += str((len(
+					lendList) - index)) + ". Lender: " + lend.lender.display_name + ", Lendee: " + lend.lendee.display_name + ", Items: " + lend.itemList + "\n"
+
+		messageBuild += "```"
+
+		if lendeeMember.display_name in messageBuild:
+			await bot.send_message(ctx.message.channel,
+			                       "25 most recent lends for " + lendeeMember.mention + "\n" + messageBuild)
+		else:
+			await bot.send_message(ctx.message.channel, "No recent lends found for" + lendeeMember.mention)
 	else:
-		await bot.send_message(ctx.message.channel, "Lend keyword not understood! Try `!lend [offer/confirm/decline/rescind]`")
+		await bot.send_message(ctx.message.channel,
+		                       "Lend keyword not understood! Try `!lend [offer/confirm/decline/rescind/list]`")
+
 
 bot.run(botToken)
