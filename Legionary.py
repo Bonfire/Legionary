@@ -1,6 +1,7 @@
 # For Legion Discord Bot
 import platform
 import math
+import datetime
 
 import discord
 from discord.ext import commands
@@ -58,7 +59,7 @@ async def help(ctx, *args):
 	commandsEmbed.add_field(name="!help",
 	                        value='Shows this help message.',
 	                        inline=False)
-	commandsEmbed.add_field(name="!agree [update]",
+	commandsEmbed.add_field(name="!agree",
 	                        value='Allows users to agree to the handbook.',
 	                        inline=False)
 	commandsEmbed.add_field(name="!recruit <name>",
@@ -354,12 +355,15 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 		lendingMember = ctx.message.author
 
 		lendEmbed = discord.Embed(title="Lend Offer from " + lendingMember.name + " to " + lendeeMember.name, color=0xffd700)
+		lendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 		lendEmbed.add_field(name="Lender", value=lendingMember.mention, inline=False)
 		lendEmbed.add_field(name="Lendee", value=lendeeMember.mention, inline=False)
 		lendEmbed.add_field(name="Items", value=itemList, inline=False)
 		lendEmbed.add_field(name="Time", value=lendTime, inline=False)
 
 		await bot.send_message(ctx.message.channel, embed=lendEmbed)
+
+
 
 bot.run(botToken)
 
