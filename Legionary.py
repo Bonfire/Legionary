@@ -27,10 +27,16 @@ legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0x2e
 membersMessages = ['', '', '', '', '', '', '']
 
 # Stat names
-statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 'Prayer', 'Magic', 'Cooking', 'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore', 'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
+statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 'Prayer', 'Magic', 'Cooking',
+             'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
+             'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
 
 # Members list of dictionaries
 membersList = []
+
+# List of current lends
+lendList = []
+
 
 @bot.event
 async def on_ready():
@@ -286,7 +292,7 @@ async def names(ctx):
 			if person.display_name != "Groovy" \
 					and person.display_name != "Legionary" \
 					and person.display_name != "Twisty Bot" \
-					and person.top_role.name != "Guest"\
+					and person.top_role.name != "Guest" \
 					and person.top_role.name != "@everyone":
 				namesFile.write(person.display_name + "\n")
 	namesFile.close()
@@ -294,6 +300,7 @@ async def names(ctx):
 
 	await modLog("Names",
 	             "<@!{}> has requested the names list".format(ctx.message.author.id), ctx)
+
 
 @bot.command(pass_context=True)
 async def stats(ctx, *, message: str):
@@ -306,7 +313,7 @@ async def stats(ctx, *, message: str):
 		statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
 
 		statDesc = "Stats for {}".format(message) + "\n (Level, XP) \n"
-		for stat in range(0,23):
+		for stat in range(0, 23):
 			statName = statNames[stat]
 			statLevel = separatedStats[stat].split(",")[1]
 			statXP = separatedStats[stat].split(",")[2]
@@ -315,34 +322,60 @@ async def stats(ctx, *, message: str):
 		statEmbed.description = statDesc
 		await bot.send_message(ctx.message.channel, embed=statEmbed)
 	else:
-		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(bot.get_channel("516433581992706058").mention))
+		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
+			bot.get_channel("516433581992706058").mention))
+
 
 @bot.command(pass_context=True)
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
 
-	hcimLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
+	hcimLookup = requests.get(
+		"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
 	separatedStats = hcimLookup.text.split("\n")
 	overallScore = int(separatedStats[0].split(",")[0])
 	skillTotal = int(separatedStats[0].split(",")[1])
 	scorePageNum = math.ceil(overallScore / 25)
 
-	scorePageHTML = requests.get("https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(scorePageNum)).content
+	scorePageHTML = requests.get(
+		"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(
+			scorePageNum)).content
 	scorePageTree = html.fromstring(scorePageHTML)
 
-	playerScores = scorePageTree.xpath('//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
-	playerScores = [name.replace('\xa0',' ') for name in playerScores]
+	playerScores = scorePageTree.xpath(
+		'//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
+	playerScores = [name.replace('\xa0', ' ') for name in playerScores]
 
 	if message in playerScores:
 		HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
 		HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "\n"
-		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(" ", "%20") + ")"
+		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
+			" ", "%20") + ")"
 		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
 	else:
 		HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
-		HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(overallScore) + ", skill total of " + str(skillTotal) + "\n"
-		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(" ", "%20") + ")"
+		HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
+			overallScore) + ", skill total of " + str(skillTotal) + "\n"
+		HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
+			" ", "%20") + ")"
 		await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
+
+
+class lendObject:
+	"""LendObject class that represents one lend offer/request"""
+	lender = None
+	lendee = None
+	itemList = None
+	lendTime = None
+	accepted = False
+
+	def __init__(self, lender, lendee, itemList, lendTime, accepted):
+		self.lender = lender
+		self.lendee = lendee
+		self.itemList = itemList
+		self.lendTime = lendTime
+		self.accepted = accepted
+
 
 @bot.command(pass_context=True)
 async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList: str = None, lendTime: str = None):
@@ -354,17 +387,48 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 	if lendeeMember is not None and itemList is not None and lendTime is not None:
 		lendingMember = ctx.message.author
 
-		lendEmbed = discord.Embed(title="Lend Offer from " + lendingMember.name + " to " + lendeeMember.name, color=0xffd700)
+		lendEmbed = discord.Embed(title="Lend Offer from " + lendingMember.display_name + " to " + lendeeMember.display_name,
+		                          color=0xffd700)
 		lendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 		lendEmbed.add_field(name="Lender", value=lendingMember.mention, inline=False)
 		lendEmbed.add_field(name="Lendee", value=lendeeMember.mention, inline=False)
 		lendEmbed.add_field(name="Items", value=itemList, inline=False)
 		lendEmbed.add_field(name="Time", value=lendTime, inline=False)
+		lendEmbed.add_field(name="Status", value="Pending", inline=False)
+
+		lendList.append(lendObject(lendingMember, lendeeMember, itemList, lendTime, False))
 
 		await bot.send_message(ctx.message.channel, embed=lendEmbed)
+	elif "confirm" in keyword:
+		for lend in lendList:
+			if lend.lendee is ctx.message.author and lend.accepted == False:
+				lend.accepted = True
 
+				acceptedLendEmbed = discord.Embed(title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " accepted", color=0x00ff00)
+				acceptedLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+				acceptedLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
+				acceptedLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
+				acceptedLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
+				acceptedLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
+				acceptedLendEmbed.add_field(name="Status", value="Accepted", inline=False)
+
+				await bot.send_message(ctx.message.channel, embed=acceptedLendEmbed)
+
+				break
+	elif "decline" in keyword:
+		for lend in lendList:
+			if lend.lendee is ctx.message.author and lend.accepted == False:
+				declinedLendEmbed = discord.Embed(title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " declined", color=0xff0000)
+				declinedLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+				declinedLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
+				declinedLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
+				declinedLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
+				declinedLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
+				declinedLendEmbed.add_field(name="Status", value="Declined", inline=False)
+
+				lendList.remove(lend)
+
+				await bot.send_message(ctx.message.channel, embed=declinedLendEmbed)
 
 
 bot.run(botToken)
-
-
