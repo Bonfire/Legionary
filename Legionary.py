@@ -260,36 +260,6 @@ async def kick(ctx, user: discord.Member):
 	             "{} was removed from the server files and kicked".format(user.display_name), ctx)
 
 
-# TODO reformat for holding data in memory instead of files
-#
-# @bot.command(pass_context=True)
-# @commands.has_any_role('Captain', 'Owner', 'General')
-# async def members(ctx, *args):
-# 	"""
-# 	Prints the current members list
-# 	Will also update the old one if asked to
-# 	"""
-#
-# 	if args == "update":
-# 		for index, message in enumerate(membersMessages):
-# 			await bot.delete_message(membersMessages[index])
-#
-#
-# 	for index, rank in enumerate(membersList):
-# 		# The title of the embed is the rank name, the color is the index of colors at the rank name
-# 		rankEmbed = discord.Embed(title=rank, color=legionColors[legionRoles.index(rank)])
-# 		rankDesc = ""
-#
-# 		for member in membersList[rank]:
-# 			rankDesc += (member + "  -  " + membersList[rank][member]['date'] + "\n")
-#
-# 		rankEmbed.description = rankDesc
-# 		membersMessages[index] = await bot.send_message(ctx.message.channel, embed=rankEmbed)
-#
-# 	await modLog("Members List",
-# 	             "<@!{}> has requested the members list".format(ctx.message.author.id), ctx)
-
-
 @bot.command(pass_context=True)
 @commands.has_any_role('Captain', 'Owner', 'General')
 async def names(ctx):
