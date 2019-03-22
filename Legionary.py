@@ -445,7 +445,26 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 				print(lendList)
 
 				await bot.send_message(ctx.message.channel, embed=declinedLendEmbed)
+	elif "rescind" in keyword:
+		for lend in lendList:
+			if lend.lender is ctx.message.author and lend.accepted == False:
+				rescindLendEmbed = discord.Embed(
+					title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " rescinded",
+					color=0xff0000)
+				rescindLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+				rescindLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
+				rescindLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
+				rescindLendEmbed.add_field(name="Items", value=lend.itemList, inline=False)
+				rescindLendEmbed.add_field(name="Time", value=lend.lendTime, inline=False)
+				rescindLendEmbed.add_field(name="Status", value="Rescinded", inline=False)
+
+				lendList.remove(lend)
+				del lend
+
+				print(lendList)
+
+				await bot.send_message(ctx.message.channel, embed=rescindLendEmbed)
 	else:
-		await bot.send_message(ctx.message.channel, "Lend keyword not understood! Try `!lend [offer/confirm/decline]`")
+		await bot.send_message(ctx.message.channel, "Lend keyword not understood! Try `!lend [offer/confirm/decline/rescind]`")
 
 bot.run(botToken)
