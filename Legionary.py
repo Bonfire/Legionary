@@ -384,27 +384,38 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 	# lendID = '515702280063025171'
 	# lendChannel = bot.get_channel(lendID)
 
-	if lendeeMember is not None and itemList is not None and lendTime is not None:
-		lendingMember = ctx.message.author
+	if "offer" in keyword:
+		if lendeeMember is not None and itemList is not None and lendTime is not None:
+			lendingMember = ctx.message.author
 
-		lendEmbed = discord.Embed(title="Lend Offer from " + lendingMember.display_name + " to " + lendeeMember.display_name,
-		                          color=0xffd700)
-		lendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-		lendEmbed.add_field(name="Lender", value=lendingMember.mention, inline=False)
-		lendEmbed.add_field(name="Lendee", value=lendeeMember.mention, inline=False)
-		lendEmbed.add_field(name="Items", value=itemList, inline=False)
-		lendEmbed.add_field(name="Time", value=lendTime, inline=False)
-		lendEmbed.add_field(name="Status", value="Pending", inline=False)
+			if lendeeMember is not lendingMember:
+				lendEmbed = discord.Embed(
+					title="Lend Offer from " + lendingMember.display_name + " to " + lendeeMember.display_name,
+					color=0xffd700)
+				lendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+				lendEmbed.add_field(name="Lender", value=lendingMember.mention, inline=False)
+				lendEmbed.add_field(name="Lendee", value=lendeeMember.mention, inline=False)
+				lendEmbed.add_field(name="Items", value=itemList, inline=False)
+				lendEmbed.add_field(name="Time", value=lendTime, inline=False)
+				lendEmbed.add_field(name="Status", value="Pending", inline=False)
 
-		lendList.append(lendObject(lendingMember, lendeeMember, itemList, lendTime, False))
+				lendList.append(lendObject(lendingMember, lendeeMember, itemList, lendTime, False))
 
-		await bot.send_message(ctx.message.channel, embed=lendEmbed)
+				print(lendList)
+
+				await bot.send_message(ctx.message.channel, embed=lendEmbed)
+			else:
+				await bot.send_message(ctx.message.channel, "You cannot lend an item to yourself!")
+		else:
+			await bot.send_message(ctx.message.channel, "Missing required parameters: `!lend offer [lendee] [items] [time]`")
 	elif "confirm" in keyword:
 		for lend in lendList:
 			if lend.lendee is ctx.message.author and lend.accepted == False:
 				lend.accepted = True
 
-				acceptedLendEmbed = discord.Embed(title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " accepted", color=0x00ff00)
+				acceptedLendEmbed = discord.Embed(
+					title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " accepted",
+					color=0x00ff00)
 				acceptedLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 				acceptedLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
 				acceptedLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
@@ -418,7 +429,9 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 	elif "decline" in keyword:
 		for lend in lendList:
 			if lend.lendee is ctx.message.author and lend.accepted == False:
-				declinedLendEmbed = discord.Embed(title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " declined", color=0xff0000)
+				declinedLendEmbed = discord.Embed(
+					title="Lend Offer from " + lend.lender.display_name + " to " + lend.lendee.display_name + " declined",
+					color=0xff0000)
 				declinedLendEmbed.description = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 				declinedLendEmbed.add_field(name="Lender", value=lend.lender.mention, inline=False)
 				declinedLendEmbed.add_field(name="Lendee", value=lend.lendee.mention, inline=False)
@@ -427,8 +440,12 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 				declinedLendEmbed.add_field(name="Status", value="Declined", inline=False)
 
 				lendList.remove(lend)
+				del lend
+
+				print(lendList)
 
 				await bot.send_message(ctx.message.channel, embed=declinedLendEmbed)
-
+	else:
+		await bot.send_message(ctx.message.channel, "Lend keyword not understood! Try `!lend [offer/confirm/decline]`")
 
 bot.run(botToken)
