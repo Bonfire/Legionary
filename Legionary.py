@@ -2,6 +2,7 @@
 import platform
 import math
 import datetime
+import time
 
 import discord
 from discord.ext import commands
@@ -14,6 +15,9 @@ import requests
 
 # Web Scraping library
 from lxml import html
+
+# Async library
+import asyncio
 
 bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
@@ -461,5 +465,14 @@ async def lend(ctx, keyword: str, lendeeMember: discord.Member = None, itemList:
 		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
 			bot.get_channel("558534286681178132").mention))
 
+def runBot():
+	loop = asyncio.get_event_loop()
+	while True:
+		try:
+			loop.run_until_complete(bot.run(botToken))
+		except Exception as e:
+			print("Error", e)
+		print("Restarting bot")
+		time.sleep(60)
 
-bot.run(botToken)
+runBot()
