@@ -90,9 +90,6 @@ async def help(ctx, *args):
 	commandsEmbed.add_field(name="!hcim <name>",
 	                        value='Looks up that RSN\'s HCIM stats and sees if they\'re dead or alive',
 	                        inline=False)
-	commandsEmbed.add_field(name="!lend <offer/accept/decline/rescind/list>",
-	                        value='offer <name> <items> <time> - Creates a lend offer\nlist <name> - Lists accepted offers for a given user',
-	                        inline=False)
 	commandsEmbed.set_footer(icon_url=ctx.message.author.avatar_url,
 	                         text="Requested by <@!{}>".format(ctx.message.author.id))
 
