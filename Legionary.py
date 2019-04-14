@@ -26,7 +26,7 @@ bot.remove_command("help")
 talkID = '515684256400277520'
 talkChannel = bot.get_channel(talkID)
 
-legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'Owner']
+legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'General Emeritus', 'Owner']
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0x2ecc71]
 membersMessages = ['', '', '', '', '', '', '']
 
