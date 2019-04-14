@@ -346,6 +346,7 @@ async def hcim(ctx, *, message: str):
 		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
 			bot.get_channel("516433581992706058").mention))
 
+
 def runBot():
 	loop = asyncio.get_event_loop()
 	while True:
@@ -355,5 +356,6 @@ def runBot():
 			print("Error", e)
 		print("Restarting bot")
 		time.sleep(60)
+
 
 runBot()
