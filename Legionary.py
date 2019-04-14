@@ -62,7 +62,7 @@ async def on_ready():
 
 # noinspection PyUnusedLocal
 @bot.command(pass_context=True)
-@commands.has_any_role('Captain', 'Owner', 'General')
+@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def help(ctx, *args):
 	commandsEmbed = discord.Embed(title="Legionary Bot Help - By Bonf", color=0xffea00)
 	commandsEmbed.description = "Type !<command> to run a command!"
@@ -209,7 +209,7 @@ async def agree(ctx):
 
 
 @bot.command(pass_context=True)
-@commands.has_any_role('Captain', 'Owner', 'General')
+@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def recruit(ctx, user: discord.Member):
 	"""This can be called to manually recruit new members"""
 
@@ -221,7 +221,7 @@ async def recruit(ctx, user: discord.Member):
 
 
 @bot.command(pass_context=True)
-@commands.has_any_role('Captain', 'Owner', 'General')
+@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def promote(ctx, user: discord.Member):
 	"""This can be called to manually promote members"""
 
@@ -254,7 +254,7 @@ async def promote(ctx, user: discord.Member):
 
 
 @bot.command(pass_context=True)
-@commands.has_any_role('Captain', 'Owner', 'General')
+@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def kick(ctx, user: discord.Member):
 	"""This is used to remove players from the clan and members list"""
 
@@ -265,7 +265,7 @@ async def kick(ctx, user: discord.Member):
 
 
 @bot.command(pass_context=True)
-@commands.has_any_role('Captain', 'Owner', 'General')
+@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def names(ctx):
 	"""Will send a list of all current members in the discord"""
 
