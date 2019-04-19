@@ -343,19 +343,4 @@ async def hcim(ctx, *, message: str):
 		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
 			bot.get_channel("516433581992706058").mention))
 
-async def task():
-	await bot.wait_until_ready()
-	while True:
-		await asyncio.sleep(1)
-		print("Bot running")
-
-while True:
-	bot.loop.create_task(task())
-	try:
-		bot.loop.run_until_complete(bot.start(botToken))
-	except Exception as e:
-		print("Exception: " + e)
-
-	print("Bot restarting")
-	bot = discord.Client(loop=bot.loop)
-
+bot.run(botToken)
