@@ -1,20 +1,16 @@
 # For Legion Discord Bot
-import platform
 import math
-import datetime
-import time
+import platform
 
 import discord
+# Requests library for web requests
+import requests
 from discord.ext import commands
+# Web Scraping library
+from lxml import html
 
 # Discord Bot Token
 from tokenFile import botToken
-
-# Requests library for web requests
-import requests
-
-# Web Scraping library
-from lxml import html
 
 bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
@@ -297,7 +293,8 @@ async def stats(ctx, *, message: str):
 		statEmbed.description = statDesc
 		await ctx.channel.send(embed=statEmbed)
 	else:
-		await ctx.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
+		await ctx.channel.send(
+			"You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
 
 
 @bot.command()
@@ -334,6 +331,8 @@ async def hcim(ctx, *, message: str):
 				" ", "%20") + ")"
 			await ctx.channel.send(embed=HCIMStatusEmbed)
 	else:
-		await ctx.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
+		await ctx.channel.send(
+			"You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
+
 
 bot.run(botToken)
