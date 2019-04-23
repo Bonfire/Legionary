@@ -102,9 +102,8 @@ async def modLog(eventName, eventDescription, *args):
 	await logChannel.send(embed=modEmbed)
 
 
-# noinspection PyUnresolvedReferences
 @bot.event
-async def on_member_join(user: discord.Member):
+async def on_member_join(user: discord.User):
 	"""
 	Sends new members a message regarding recruiting information
 	Also adds them to the members list
@@ -112,7 +111,6 @@ async def on_member_join(user: discord.Member):
 
 	recruitmentEmbed = discord.Embed(title="Recruitment to OS Lost Legion", color=0xffea00)
 	recruitmentEmbed.description = "Thank you for showing interest in joining OS Lost Legion!\nI am a bot that will help walk you through the recruitment process\nPlease follow these steps to join:"
-
 	recruitmentEmbed.add_field(name="1. Read The Handbook",
 	                           value="Please view The Handbook located on the <#468933726894555136> channel",
 	                           inline=False)
@@ -126,9 +124,7 @@ async def on_member_join(user: discord.Member):
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
 	await user.send(embed=recruitmentEmbed)
-	await modLog("Join",
-	             "<@!{}> has joined the server. A recruitment message has been sent.".format(user.id))
-
+	await modLog("Join", "<@!{}> has joined the server. A recruitment message has been sent.".format(user.id))
 	addMember(user)
 
 
@@ -137,7 +133,7 @@ async def on_member_remove(user: discord.Member):
 	"""Removes members who leave the server from the members list"""
 
 	removeMember(user)
-	await modLog("Leave", "<@!{}> has left the server".format(user.id))
+	await modLog("Leave", "{} (<@!{}>) has left the server".format(user.display_name, user.id))
 
 
 @bot.event
