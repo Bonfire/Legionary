@@ -27,7 +27,7 @@ async def on_ready():
 	"""
 
 	print('Logged in as {} (ID: {}) | Connected to {} servers | Connected to {} users'
-	      .format(bot.user.name, bot.user.id, str(len(bot.guilds))), str(len(set(bot.get_all_members()))))
+	      .format(bot.user.name, bot.user.id, len(bot.guilds), len(set(bot.get_all_members()))))
 	print('Current Discord.py Version: {} | Current Python Version: {}'
 	      .format(discord.__version__, platform.python_version()))
 
