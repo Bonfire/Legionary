@@ -90,7 +90,7 @@ async def help(ctx, *args):
 	commandsEmbed.set_footer(icon_url=ctx.message.author.avatar_url,
 	                         text="Requested by <@!{}>".format(ctx.message.author.id))
 
-	await bot.send_message(ctx.message.channel, embed=commandsEmbed)
+	await ctx.message.channel.send(embed=commandsEmbed)
 	await modLog("Help",
 	             "<@!{}> has requested the commands list".format(ctx.message.author.id), ctx)
 
@@ -123,7 +123,7 @@ async def modLog(eventName, eventDescription, *args):
 	if len(args) > 0:
 		modEmbed.add_field(name='Link', value='[Link to Message](https://discordapp.com/channels/{}/{}/{})'.format(
 			args[0].message.guild.id, args[0].message.channel.id, args[0].message.id))
-	await bot.send_message(logChannel, embed=modEmbed)
+	await logChannel.send(embed=modEmbed)
 
 
 # noinspection PyUnresolvedReferences
@@ -149,7 +149,7 @@ async def on_member_join(user: discord.Member):
 	                           value="Type \"!agree\" in the <#515688016207937585> channel when you have changed your name and agree to The Handbook",
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
-	await bot.send_message(user, embed=recruitmentEmbed)
+	await user.send(embed=recruitmentEmbed)
 	await modLog("Join",
 	             "<@!{}> has joined the server. A recruitment message has been sent.".format(user.id))
 
@@ -195,8 +195,7 @@ async def agree(ctx):
 	if ctx.message.channel.name == 'agree':
 		recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
 		await ctx.message.author.add_roles(roles=recruitRoleID)
-		await bot.send_message(newsChannel,
-		                       "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
+		await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
 
 		await modLog("Agreement",
 		             "<@!{}> has agreed to the handbook".format(ctx.message.author.id), ctx)
@@ -211,7 +210,7 @@ async def recruit(ctx, user: discord.Member):
 	newsChannel = bot.get_channel(newsID)
 	recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
 	await user.add_roles(roles=recruitRoleID)
-	await bot.send_message(newsChannel, "@everyone please welcome <@!%s> to the clan!" % user.id)
+	await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
 @bot.command(pass_context=True)
@@ -239,8 +238,7 @@ async def promote(ctx, user: discord.Member):
 		else:
 			await user.edit(roles=[newRoleID])
 
-		await bot.send_message(newsChannel,
-		                       "<@!%s> has been promoted to %s!" % (user.id, newRoleName))
+		await newsChannel.send("<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
 		await modLog("Promotion",
 		             "<@!{}> was promoted to {} by {}".format(user.id, user.top_role,
@@ -297,10 +295,9 @@ async def stats(ctx, *, message: str):
 			statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
 
 		statEmbed.description = statDesc
-		await bot.send_message(ctx.message.channel, embed=statEmbed)
+		await ctx.message.channel.send(embed=statEmbed)
 	else:
-		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
-			bot.get_channel(516433581992706058).mention))
+		await ctx.message.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
 
 
 @bot.command(pass_context=True)
@@ -328,16 +325,15 @@ async def hcim(ctx, *, message: str):
 			HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "\n"
 			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
 				" ", "%20") + ")"
-			await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
+			await ctx.message.channel.send(embed=HCIMStatusEmbed)
 		else:
 			HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
 			HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
 				overallScore) + ", skill total of " + str(skillTotal) + "\n"
 			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
 				" ", "%20") + ")"
-			await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
+			await ctx.message.channel.send(embed=HCIMStatusEmbed)
 	else:
-		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
-			bot.get_channel(516433581992706058).mention))
+		await ctx.message.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
 
 bot.run(botToken)
