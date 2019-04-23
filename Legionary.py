@@ -8,6 +8,9 @@ from lxml import html
 # Discord Bot Token
 from tokenFile import botToken
 
+bot = commands.Bot(command_prefix="!")
+bot.remove_command("help")
+
 # List of members, list of roles, list of colors, and list of stat names
 membersList = []
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'General Emeritus', 'Owner']
@@ -16,8 +19,8 @@ statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 
              'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
              'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
 
-bot = commands.Bot(command_prefix="!")
-bot.remove_command("help")
+# Channel objects
+logChannel = bot.get_channel(515702280063025171)
 
 @bot.event
 async def on_ready():
@@ -90,11 +93,6 @@ def removeMember(user: discord.User):
 
 async def modLog(eventName, eventDescription, *args):
 	"""Logs any bot commands and actions to the proper channel"""
-
-	# Mod Channel ID
-	logID = 515702280063025171
-	logChannel = bot.get_channel(logID)
-
 	modEmbed = discord.Embed(title='Moderation Log', color=0xffea00)
 	modEmbed.add_field(name='Event: ' + eventName, value=eventDescription, inline=False)
 
