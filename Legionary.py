@@ -192,7 +192,7 @@ async def agree(ctx):
 
 	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
-	if ctx.message.channel.name == 'agree':
+	if ctx.channel.name == 'agree':
 		recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
 		await ctx.message.author.add_roles(roles=recruitRoleID)
 		await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
@@ -271,7 +271,7 @@ async def names(ctx):
 					and person.top_role.name != "@everyone":
 				namesFile.write(person.display_name + "\n")
 	namesFile.close()
-	await bot.send_file(ctx.message.channel, "./Names.txt")
+	await bot.send_file(ctx.channel, "./Names.txt")
 
 	await modLog("Names",
 	             "<@!{}> has requested the names list".format(ctx.message.author.id), ctx)
@@ -281,7 +281,7 @@ async def names(ctx):
 async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
-	if ctx.message.channel.id == 516433581992706058:
+	if ctx.channel.id == 516433581992706058:
 		hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
 		separatedStats = hiscoreLookup.text.split("\n")
 
@@ -295,15 +295,15 @@ async def stats(ctx, *, message: str):
 			statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
 
 		statEmbed.description = statDesc
-		await ctx.message.channel.send(embed=statEmbed)
+		await ctx.channel.send(embed=statEmbed)
 	else:
-		await ctx.message.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
+		await ctx.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
 
 
 @bot.command(pass_context=True)
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
-	if ctx.message.channel.id == 516433581992706058:
+	if ctx.channel.id == 516433581992706058:
 		hcimLookup = requests.get(
 			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
 		separatedStats = hcimLookup.text.split("\n")
@@ -325,15 +325,15 @@ async def hcim(ctx, *, message: str):
 			HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "\n"
 			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
 				" ", "%20") + ")"
-			await ctx.message.channel.send(embed=HCIMStatusEmbed)
+			await ctx.channel.send(embed=HCIMStatusEmbed)
 		else:
 			HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
 			HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
 				overallScore) + ", skill total of " + str(skillTotal) + "\n"
 			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
 				" ", "%20") + ")"
-			await ctx.message.channel.send(embed=HCIMStatusEmbed)
+			await ctx.channel.send(embed=HCIMStatusEmbed)
 	else:
-		await ctx.message.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
+		await ctx.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
 
 bot.run(botToken)
