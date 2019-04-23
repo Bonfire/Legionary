@@ -175,7 +175,7 @@ async def agree(ctx):
 
 @bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
-async def recruit(ctx, user: discord.Member):
+async def recruit(ctx, user: discord.User):
 	"""This can be called to manually recruit new members"""
 
 	recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
@@ -185,7 +185,7 @@ async def recruit(ctx, user: discord.Member):
 
 @bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
-async def promote(ctx, user: discord.Member):
+async def promote(ctx, user: discord.User):
 	"""This can be called to manually promote members"""
 
 	currentRole = user.top_role
