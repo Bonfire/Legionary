@@ -47,11 +47,11 @@ async def on_ready():
 	"""
 
 	print('Logged in as ' + bot.user.name + ' (ID:' + bot.user.id + ') | Connected to ' + str(
-		len(bot.servers)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
+		len(bot.guilds)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
 	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
 	                                                                           platform.python_version()))
 
-	for server in bot.servers:
+	for server in bot.guilds:
 		if server.name == "Lost Legion":
 			for member in server.members:
 				addMember(member)
@@ -122,7 +122,7 @@ async def modLog(eventName, eventDescription, *args):
 
 	if len(args) > 0:
 		modEmbed.add_field(name='Link', value='[Link to Message](https://discordapp.com/channels/{}/{}/{})'.format(
-			args[0].message.server.id, args[0].message.channel.id, args[0].message.id))
+			args[0].message.guild.id, args[0].message.channel.id, args[0].message.id))
 	await bot.send_message(logChannel, embed=modEmbed)
 
 
@@ -193,7 +193,7 @@ async def agree(ctx):
 	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
 	if ctx.message.channel.name == 'agree':
-		recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
+		recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
 		await bot.add_roles(ctx.message.author, recruitRoleID)
 		await bot.send_message(newsChannel,
 		                       "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
@@ -209,7 +209,7 @@ async def recruit(ctx, user: discord.Member):
 
 	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
-	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
+	recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
 	await bot.add_roles(user.id, recruitRoleID)
 	await bot.send_message(newsChannel, "@everyone please welcome <@!%s> to the clan!" % user.id)
 
@@ -227,14 +227,14 @@ async def promote(ctx, user: discord.Member):
 		newRoleName = legionRoles[newRoleNumber]
 
 		# Remove all roles and replace with the new one
-		newRoleID = discord.utils.get(ctx.message.server.roles, name=newRoleName)
+		newRoleID = discord.utils.get(ctx.message.guild.roles, name=newRoleName)
 
 		# Make sure we give the higher roles their moderator statuses
 		if newRoleName == 'Lieutenant' or newRoleName == 'Captain':
-			modRoleID = discord.utils.get(ctx.message.server.roles, name="Moderator")
+			modRoleID = discord.utils.get(ctx.message.guild.roles, name="Moderator")
 			await bot.replace_roles(user, newRoleID, modRoleID)
 		elif newRoleName == 'General':
-			globalRoleID = discord.utils.get(ctx.message.server.roles, name="Global Moderator")
+			globalRoleID = discord.utils.get(ctx.message.guild.roles, name="Global Moderator")
 			await bot.replace_roles(user, newRoleID, globalRoleID)
 		else:
 			await bot.replace_roles(user, newRoleID)
@@ -264,7 +264,7 @@ async def names(ctx):
 	"""Will send a list of all current members in the discord"""
 
 	with open("Names.txt", "w+") as namesFile:
-		members = ctx.message.server.members
+		members = ctx.message.guild.members
 		for person in members:
 			if person.display_name != "Groovy" \
 					and person.display_name != "Legionary" \
