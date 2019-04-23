@@ -186,7 +186,7 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 			                                                                  newInfo.top_role.name))
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def agree(ctx):
 	"""This will recruit new members once they've agreed to the handbook"""
 
@@ -201,7 +201,7 @@ async def agree(ctx):
 		             "<@!{}> has agreed to the handbook".format(ctx.author.id), ctx)
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def recruit(ctx, user: discord.Member):
 	"""This can be called to manually recruit new members"""
@@ -213,7 +213,7 @@ async def recruit(ctx, user: discord.Member):
 	await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def promote(ctx, user: discord.Member):
 	"""This can be called to manually promote members"""
@@ -245,7 +245,7 @@ async def promote(ctx, user: discord.Member):
 		                                                      ctx.author.display_name), ctx)
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def kick(ctx, user: discord.Member):
 	"""This is used to remove players from the clan and members list"""
@@ -256,7 +256,7 @@ async def kick(ctx, user: discord.Member):
 	             "{} was removed from the server files and kicked".format(user.display_name), ctx)
 
 
-@bot.command(pass_context=True)
+@bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def names(ctx):
 	"""Will send a list of all current members in the discord"""
@@ -277,7 +277,7 @@ async def names(ctx):
 	             "<@!{}> has requested the names list".format(ctx.author.id), ctx)
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
@@ -300,7 +300,7 @@ async def stats(ctx, *, message: str):
 		await ctx.channel.send("You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
 
 
-@bot.command(pass_context=True)
+@bot.command()
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
 	if ctx.channel.id == 516433581992706058:
