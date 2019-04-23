@@ -31,9 +31,6 @@ statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 
 # Members list of dictionaries
 membersList = []
 
-# List of current lends
-lendList = []
-
 
 @bot.event
 async def on_ready():
