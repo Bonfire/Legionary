@@ -8,16 +8,13 @@ from lxml import html
 # Discord Bot Token
 from tokenFile import botToken
 
+# List of members, list of roles, list of colors, and list of stat names
+membersList = []
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'General Emeritus', 'Owner']
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0xad1457, 0x2ecc71]
-
-# Stat names
 statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 'Prayer', 'Magic', 'Cooking',
              'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
              'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
-
-# Members list of dictionaries
-membersList = []
 
 bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
@@ -29,10 +26,10 @@ async def on_ready():
 	Also populates the members list of dictionaries
 	"""
 
-	print('Logged in as ' + bot.user.name + ' (ID:' + str(bot.user.id) + ') | Connected to ' + str(
-		len(bot.guilds)) + ' servers | Connected to ' + str(len(set(bot.get_all_members()))) + ' users')
-	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__,
-	                                                                           platform.python_version()))
+	print('Logged in as {} (ID: {}) | Connected to {} servers | Connected to {} users'
+	      .format(bot.user.name, bot.user.id, str(len(bot.guilds))), str(len(set(bot.get_all_members()))))
+	print('Current Discord.py Version: {} | Current Python Version: {}'
+	      .format(discord.__version__, platform.python_version()))
 
 	for server in bot.guilds:
 		if server.name == "Lost Legion":
