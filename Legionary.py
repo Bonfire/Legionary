@@ -37,7 +37,6 @@ async def on_ready():
 				addMember(member)
 
 
-# noinspection PyUnusedLocal
 @bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def help(ctx, *args):
@@ -71,8 +70,7 @@ async def help(ctx, *args):
 	                         text="Requested by <@!{}>".format(ctx.author.id))
 
 	await ctx.message.channel.send(embed=commandsEmbed)
-	await modLog("Help",
-	             "<@!{}> has requested the commands list".format(ctx.author.id), ctx)
+	await modLog("Help", "<@!{}> has requested the commands list".format(ctx.author.id), ctx)
 
 
 def addMember(member: discord.member):
