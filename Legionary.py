@@ -194,7 +194,7 @@ async def agree(ctx):
 	newsChannel = bot.get_channel(newsID)
 	if ctx.message.channel.name == 'agree':
 		recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
-		await bot.add_roles(ctx.message.author, recruitRoleID)
+		await ctx.message.author.add_roles(roles=recruitRoleID)
 		await bot.send_message(newsChannel,
 		                       "@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
 
@@ -210,7 +210,7 @@ async def recruit(ctx, user: discord.Member):
 	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
 	recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
-	await bot.add_roles(user.id, recruitRoleID)
+	await user.add_roles(roles=recruitRoleID)
 	await bot.send_message(newsChannel, "@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
