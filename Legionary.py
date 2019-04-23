@@ -214,13 +214,13 @@ async def promote(ctx, user: discord.User):
 
 @bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
-async def kick(ctx, user: discord.Member):
+async def kick(ctx, user: discord.User):
 	"""This is used to remove players from the clan and members list"""
 
 	removeMember(user)
 	await user.kick()
-	await modLog("Kick",
-	             "{} was removed from the server files and kicked".format(user.display_name), ctx)
+	await modLog("Kick", "{} was removed from the server files and kicked"
+	             .format(user.display_name), ctx)
 
 
 @bot.command()
@@ -231,17 +231,13 @@ async def names(ctx):
 	with open("Names.txt", "w+") as namesFile:
 		members = ctx.guild.members
 		for person in members:
-			if person.display_name != "Groovy" \
-					and person.display_name != "Legionary" \
-					and person.display_name != "Twisty Bot" \
-					and person.top_role.name != "Guest" \
-					and person.top_role.name != "@everyone":
+			if person.bot is False and person.top_role.name != "Guest" and person.top_role.name != "@everyone":
 				namesFile.write(person.display_name + "\n")
 	namesFile.close()
 	await bot.send_file(ctx.channel, "./Names.txt")
 
-	await modLog("Names",
-	             "<@!{}> has requested the names list".format(ctx.author.id), ctx)
+	await modLog("Names", "<@!{}> has requested the names list"
+	             .format(ctx.author.id), ctx)
 
 
 @bot.command()
