@@ -253,7 +253,7 @@ async def kick(ctx, user: discord.Member):
 	"""This is used to remove players from the clan and members list"""
 
 	removeMember(user)
-	await bot.kick(user)
+	await user.kick()
 	await modLog("Kick",
 	             "{} was removed from the server files and kicked".format(user.display_name), ctx)
 
