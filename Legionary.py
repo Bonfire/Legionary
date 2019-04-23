@@ -193,7 +193,7 @@ async def agree(ctx):
 	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
 	if ctx.channel.name == 'agree':
-		recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
+		recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
 		await ctx.author.add_roles(roles=recruitRoleID)
 		await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.author.id)
 
@@ -208,7 +208,7 @@ async def recruit(ctx, user: discord.Member):
 
 	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
-	recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
+	recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
 	await user.add_roles(roles=recruitRoleID)
 	await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % user.id)
 
@@ -226,14 +226,14 @@ async def promote(ctx, user: discord.Member):
 		newRoleName = legionRoles[newRoleNumber]
 
 		# Remove all roles and replace with the new one
-		newRoleID = discord.utils.get(ctx.message.guild.roles, name=newRoleName)
+		newRoleID = discord.utils.get(ctx.guild.roles, name=newRoleName)
 
 		# Make sure we give the higher roles their moderator statuses
 		if newRoleName == 'Lieutenant' or newRoleName == 'Captain':
-			modRoleID = discord.utils.get(ctx.message.guild.roles, name="Moderator")
+			modRoleID = discord.utils.get(ctx.guild.roles, name="Moderator")
 			await user.edit(roles=[newRoleID, modRoleID])
 		elif newRoleName == 'General':
-			globalRoleID = discord.utils.get(ctx.message.guild.roles, name="Global Moderator")
+			globalRoleID = discord.utils.get(ctx.guild.roles, name="Global Moderator")
 			await user.edit(roles=[newRoleID, globalRoleID])
 		else:
 			await user.edit(roles=[newRoleID])
@@ -262,7 +262,7 @@ async def names(ctx):
 	"""Will send a list of all current members in the discord"""
 
 	with open("Names.txt", "w+") as namesFile:
-		members = ctx.message.guild.members
+		members = ctx.guild.members
 		for person in members:
 			if person.display_name != "Groovy" \
 					and person.display_name != "Legionary" \
