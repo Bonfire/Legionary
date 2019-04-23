@@ -1,23 +1,12 @@
-# For Legion Discord Bot
 import math
 import platform
-
-import discord
-# Requests library for web requests
 import requests
+import discord
 from discord.ext import commands
-# Web Scraping library
 from lxml import html
 
 # Discord Bot Token
 from tokenFile import botToken
-
-bot = commands.Bot(command_prefix="!")
-bot.remove_command("help")
-
-# Talk Channel ID
-talkID = 515684256400277520
-talkChannel = bot.get_channel(talkID)
 
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'General Emeritus', 'Owner']
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0xad1457, 0x2ecc71]
@@ -30,6 +19,8 @@ statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 
 # Members list of dictionaries
 membersList = []
 
+bot = commands.Bot(command_prefix="!")
+bot.remove_command("help")
 
 @bot.event
 async def on_ready():
