@@ -261,12 +261,13 @@ async def stats(ctx, *, message: str):
 		await ctx.channel.send(embed=statEmbed)
 	else:
 		await ctx.channel.send(
-			"You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
+			"You can only run this command in {}".format(botChannel.mention))
 
 
 @bot.command()
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
+
 	if ctx.channel == botChannel:
 		hcimLookup = requests.get(
 			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
@@ -299,7 +300,7 @@ async def hcim(ctx, *, message: str):
 			await ctx.channel.send(embed=HCIMStatusEmbed)
 	else:
 		await ctx.channel.send(
-			"You can only run this command in {}".format(bot.get_channel(516433581992706058).mention))
+			"You can only run this command in {}".format(botChannel.mention))
 
 
 bot.run(botToken)
