@@ -87,12 +87,12 @@ async def help(ctx, *args):
 	commandsEmbed.add_field(name="!hcim <name>",
 	                        value='Looks up that RSN\'s HCIM stats and sees if they\'re dead or alive',
 	                        inline=False)
-	commandsEmbed.set_footer(icon_url=ctx.message.author.avatar_url,
-	                         text="Requested by <@!{}>".format(ctx.message.author.id))
+	commandsEmbed.set_footer(icon_url=ctx.author.avatar_url,
+	                         text="Requested by <@!{}>".format(ctx.author.id))
 
 	await ctx.message.channel.send(embed=commandsEmbed)
 	await modLog("Help",
-	             "<@!{}> has requested the commands list".format(ctx.message.author.id), ctx)
+	             "<@!{}> has requested the commands list".format(ctx.author.id), ctx)
 
 
 def addMember(member: discord.member):
@@ -194,11 +194,11 @@ async def agree(ctx):
 	newsChannel = bot.get_channel(newsID)
 	if ctx.channel.name == 'agree':
 		recruitRoleID = discord.utils.get(ctx.message.guild.roles, name="Recruit")
-		await ctx.message.author.add_roles(roles=recruitRoleID)
-		await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.message.author.id)
+		await ctx.author.add_roles(roles=recruitRoleID)
+		await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.author.id)
 
 		await modLog("Agreement",
-		             "<@!{}> has agreed to the handbook".format(ctx.message.author.id), ctx)
+		             "<@!{}> has agreed to the handbook".format(ctx.author.id), ctx)
 
 
 @bot.command(pass_context=True)
@@ -242,7 +242,7 @@ async def promote(ctx, user: discord.Member):
 
 		await modLog("Promotion",
 		             "<@!{}> was promoted to {} by {}".format(user.id, user.top_role,
-		                                                      ctx.message.author.display_name), ctx)
+		                                                      ctx.author.display_name), ctx)
 
 
 @bot.command(pass_context=True)
@@ -274,7 +274,7 @@ async def names(ctx):
 	await bot.send_file(ctx.channel, "./Names.txt")
 
 	await modLog("Names",
-	             "<@!{}> has requested the names list".format(ctx.message.author.id), ctx)
+	             "<@!{}> has requested the names list".format(ctx.author.id), ctx)
 
 
 @bot.command(pass_context=True)
