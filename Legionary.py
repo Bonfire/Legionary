@@ -20,7 +20,7 @@ bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
 
 # Talk Channel ID
-talkID = '515684256400277520'
+talkID = 515684256400277520
 talkChannel = bot.get_channel(talkID)
 
 legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'General Emeritus', 'Owner']
@@ -114,7 +114,7 @@ async def modLog(eventName, eventDescription, *args):
 	"""Logs any bot commands and actions to the proper channel"""
 
 	# Mod Channel ID
-	logID = '515702280063025171'
+	logID = 515702280063025171
 	logChannel = bot.get_channel(logID)
 
 	modEmbed = discord.Embed(title='Moderation Log', color=0xffea00)
@@ -190,7 +190,7 @@ async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
 async def agree(ctx):
 	"""This will recruit new members once they've agreed to the handbook"""
 
-	newsID = '515684275580960769'
+	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
 	if ctx.message.channel.name == 'agree':
 		recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
@@ -207,7 +207,7 @@ async def agree(ctx):
 async def recruit(ctx, user: discord.Member):
 	"""This can be called to manually recruit new members"""
 
-	newsID = '515684275580960769'
+	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
 	recruitRoleID = discord.utils.get(ctx.message.server.roles, name="Recruit")
 	await bot.add_roles(user.id, recruitRoleID)
@@ -219,7 +219,7 @@ async def recruit(ctx, user: discord.Member):
 async def promote(ctx, user: discord.Member):
 	"""This can be called to manually promote members"""
 
-	newsID = '515684275580960769'
+	newsID = 515684275580960769
 	newsChannel = bot.get_channel(newsID)
 	currentRole = user.top_role
 	if currentRole.name != 'Owner' and user.display_name != '@everyone':
@@ -283,7 +283,7 @@ async def names(ctx):
 async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
-	if ctx.message.channel.id == "516433581992706058":
+	if ctx.message.channel.id == 516433581992706058:
 		hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
 		separatedStats = hiscoreLookup.text.split("\n")
 
@@ -300,13 +300,13 @@ async def stats(ctx, *, message: str):
 		await bot.send_message(ctx.message.channel, embed=statEmbed)
 	else:
 		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
-			bot.get_channel("516433581992706058").mention))
+			bot.get_channel(516433581992706058).mention))
 
 
 @bot.command(pass_context=True)
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
-	if ctx.message.channel.id == "516433581992706058":
+	if ctx.message.channel.id == 516433581992706058:
 		hcimLookup = requests.get(
 			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
 		separatedStats = hcimLookup.text.split("\n")
@@ -338,6 +338,6 @@ async def hcim(ctx, *, message: str):
 			await bot.send_message(ctx.message.channel, embed=HCIMStatusEmbed)
 	else:
 		await bot.send_message(ctx.message.channel, "You can only run this command in {}".format(
-			bot.get_channel("516433581992706058").mention))
+			bot.get_channel(516433581992706058).mention))
 
 bot.run(botToken)
