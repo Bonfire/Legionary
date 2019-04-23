@@ -58,7 +58,7 @@ async def on_ready():
 
 
 # noinspection PyUnusedLocal
-@bot.command(pass_context=True)
+@bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def help(ctx, *args):
 	commandsEmbed = discord.Embed(title="Legionary Bot Help - By Bonf", color=0xffea00)
