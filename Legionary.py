@@ -21,6 +21,9 @@ statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 
 
 # Channel objects
 logChannel = bot.get_channel(515702280063025171)
+newsChannel = bot.get_channel(515684275580960769)
+agreeChannel = bot.get_channel(515688016207937585)
+botChannel = bot.get_channel(516433581992706058)
 
 @bot.event
 async def on_ready():
@@ -137,40 +140,37 @@ async def on_member_remove(user: discord.Member):
 
 
 @bot.event
-async def on_member_update(oldInfo: discord.Member, newInfo: discord.Member):
+async def on_member_update(oldUserInfo: discord.User, newUserInfo: discord.User):
 	"""
 	Updates member data in the members list
 	Will update names, promotions, demotions, and recruitment
 	"""
 
-	if oldInfo.display_name != newInfo.display_name:
-		if oldInfo.display_name != '@everyone':
-			removeMember(oldInfo)
-			addMember(newInfo)
-			await modLog("Name Change", "{} has changed their name to <@!{}>".format(oldInfo.display_name, newInfo.id))
+	if oldUserInfo.display_name != newUserInfo.display_name:
+		if oldUserInfo.display_name != '@everyone':
+			removeMember(oldUserInfo)
+			addMember(oldUserInfo)
+			await modLog("Name Change", "{} has changed their name to <@!{}>"
+			             .format(oldUserInfo.display_name, newUserInfo.id))
 
-	if oldInfo.top_role != newInfo.top_role:
-		if oldInfo.top_role.name != '@everyone':
-			removeMember(oldInfo)
-			addMember(newInfo)
-			await modLog("Rank Change",
-			             "<@!{}> had their rank changed from {} to {}".format(oldInfo.id, oldInfo.top_role.name,
-			                                                                  newInfo.top_role.name))
+	if oldUserInfo.top_role != newUserInfo.top_role:
+		if oldUserInfo.top_role.name != '@everyone':
+			removeMember(oldUserInfo)
+			addMember(newUserInfo)
+			await modLog("Rank Change", "<@!{}> had their rank changed from {} to {}"
+			             .format(oldUserInfo.id, oldUserInfo.top_role.name, newUserInfo.top_role.name))
 
 
 @bot.command()
 async def agree(ctx):
 	"""This will recruit new members once they've agreed to the handbook"""
 
-	newsID = 515684275580960769
-	newsChannel = bot.get_channel(newsID)
-	if ctx.channel.name == 'agree':
+	if ctx.channel == agreeChannel:
 		recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
 		await ctx.author.add_roles(roles=recruitRoleID)
 		await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.author.id)
-
-		await modLog("Agreement",
-		             "<@!{}> has agreed to the handbook".format(ctx.author.id), ctx)
+		await modLog("Agreement", "<@!{}> has agreed to the handbook"
+		             .format(ctx.author.id), ctx)
 
 
 @bot.command()
@@ -178,8 +178,6 @@ async def agree(ctx):
 async def recruit(ctx, user: discord.Member):
 	"""This can be called to manually recruit new members"""
 
-	newsID = 515684275580960769
-	newsChannel = bot.get_channel(newsID)
 	recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
 	await user.add_roles(roles=recruitRoleID)
 	await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % user.id)
@@ -190,8 +188,6 @@ async def recruit(ctx, user: discord.Member):
 async def promote(ctx, user: discord.Member):
 	"""This can be called to manually promote members"""
 
-	newsID = 515684275580960769
-	newsChannel = bot.get_channel(newsID)
 	currentRole = user.top_role
 	if currentRole.name != 'Owner' and user.display_name != '@everyone':
 		newRoleNumber = legionRoles.index(currentRole.name) + 1
@@ -253,7 +249,7 @@ async def names(ctx):
 async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
-	if ctx.channel.id == 516433581992706058:
+	if ctx.channel == botChannel:
 		hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
 		separatedStats = hiscoreLookup.text.split("\n")
 
@@ -276,7 +272,7 @@ async def stats(ctx, *, message: str):
 @bot.command()
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
-	if ctx.channel.id == 516433581992706058:
+	if ctx.channel == botChannel:
 		hcimLookup = requests.get(
 			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
 		separatedStats = hcimLookup.text.split("\n")
