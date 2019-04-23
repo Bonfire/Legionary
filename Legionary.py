@@ -16,9 +16,6 @@ import requests
 # Web Scraping library
 from lxml import html
 
-# Async library
-import asyncio
-
 bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
 
