@@ -73,18 +73,18 @@ async def help(ctx, *args):
 	await modLog("Help", "<@!{}> has requested the commands list".format(ctx.author.id), ctx)
 
 
-def addMember(member: discord.member):
+def addMember(user: discord.User):
 	"""Adds a new user to the members list"""
 
-	newMember = {'name': member.display_name, 'id': member.id, 'role': member.top_role.name}
+	newMember = {'name': user.display_name, 'id': user.id, 'role': user.top_role.name}
 	membersList.append(dict(newMember))
 
 
-def removeMember(member: discord.member):
+def removeMember(user: discord.User):
 	"""Searches the members list for a specific member and removes them"""
 
 	for memberData in membersList:
-		if memberData['name'] == member.display_name:
+		if memberData['name'] == user.display_name:
 			membersList.remove(memberData)
 
 
