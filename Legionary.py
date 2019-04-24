@@ -45,7 +45,6 @@ async def on_ready():
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
 async def help(ctx, *args):
 	commandsEmbed = discord.Embed(title="Legionary Bot Help - By Bonf", color=0xffea00)
 	commandsEmbed.description = "Type !<command> to run a command!"
@@ -56,16 +55,16 @@ async def help(ctx, *args):
 	                        value='Allows users to agree to the handbook.',
 	                        inline=False)
 	commandsEmbed.add_field(name="!recruit <name>",
-	                        value='Manually recruits a user by name.',
+	                        value='Manually recruits a user by name. (Captain+)',
 	                        inline=False)
 	commandsEmbed.add_field(name="!promote <name>",
-	                        value='Manually promotes a user by name.',
+	                        value='Manually promotes a user by name. (Captain+)',
 	                        inline=False)
 	commandsEmbed.add_field(name="!kick <name>",
-	                        value='Kicks a user from the server.',
+	                        value='Kicks a user from the server. (Captain+)',
 	                        inline=False)
 	commandsEmbed.add_field(name="!names",
-	                        value='Uploads the name of all current clan members.',
+	                        value='Uploads the name of all current clan members. (Captain+)',
 	                        inline=False)
 	commandsEmbed.add_field(name="!stats <name>",
 	                        value='Looks up that RSN\'s stats.',
@@ -74,7 +73,7 @@ async def help(ctx, *args):
 	                        value='Looks up that RSN\'s HCIM stats and sees if they\'re dead or alive',
 	                        inline=False)
 	commandsEmbed.set_footer(icon_url=ctx.author.avatar_url,
-	                         text="Requested by <@!{}>".format(ctx.author.id))
+	                         text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
 
 	await ctx.message.channel.send(embed=commandsEmbed)
 	await modLog("Help", "<@!{}> has requested the commands list".format(ctx.author.id), ctx)
@@ -259,6 +258,8 @@ async def stats(ctx, *, message: str):
 			statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
 
 		statEmbed.description = statDesc
+		statEmbed.set_footer(icon_url=ctx.author.avatar_url,
+		                     text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
 		await ctx.channel.send(embed=statEmbed)
 	else:
 		await ctx.channel.send(
@@ -298,6 +299,8 @@ async def hcim(ctx, *, message: str):
 				overallScore) + ", skill total of " + str(skillTotal) + "\n"
 			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
 				" ", "%20") + ")"
+			HCIMStatusEmbed.set_footer(icon_url=ctx.author.avatar_url,
+			                           text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
 			await ctx.channel.send(embed=HCIMStatusEmbed)
 	else:
 		await ctx.channel.send(
