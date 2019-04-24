@@ -1,7 +1,8 @@
 import math
 import platform
-import requests
+
 import discord
+import requests
 from discord.ext import commands
 from lxml import html
 
@@ -19,11 +20,6 @@ statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 
              'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
              'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
 
-# Channel objects
-logChannel = bot.get_channel(515702280063025171)
-newsChannel = bot.get_channel(515684275580960769)
-agreeChannel = bot.get_channel(515688016207937585)
-botChannel = bot.get_channel(516433581992706058)
 
 @bot.event
 async def on_ready():
@@ -41,6 +37,11 @@ async def on_ready():
 		if server.name == "Lost Legion":
 			for member in server.members:
 				addMember(member)
+
+	bot.logChannel = bot.get_channel(515702280063025171)
+	bot.newsChannel = bot.get_channel(515684275580960769)
+	bot.agreeChannel = bot.get_channel(515688016207937585)
+	bot.botChannel = bot.get_channel(516107373538967563)
 
 
 @bot.command()
@@ -102,7 +103,7 @@ async def modLog(eventName, eventDescription, *args):
 	if len(args) > 0:
 		modEmbed.add_field(name='Link', value='[Link to Message](https://discordapp.com/channels/{}/{}/{})'.format(
 			args[0].message.guild.id, args[0].message.channel.id, args[0].message.id))
-	await logChannel.send(embed=modEmbed)
+	await bot.logChannel.send(embed=modEmbed)
 
 
 @bot.event
@@ -165,10 +166,10 @@ async def on_member_update(oldUserInfo: discord.User, newUserInfo: discord.User)
 async def agree(ctx):
 	"""This will recruit new members once they've agreed to the handbook"""
 
-	if ctx.channel == agreeChannel:
+	if ctx.channel == bot.agreeChannel:
 		recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
 		await ctx.author.add_roles(roles=recruitRoleID)
-		await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.author.id)
+		await bot.newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.author.id)
 		await modLog("Agreement", "<@!{}> has agreed to the handbook"
 		             .format(ctx.author.id), ctx)
 
@@ -180,7 +181,7 @@ async def recruit(ctx, user: discord.User):
 
 	recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
 	await user.add_roles(roles=recruitRoleID)
-	await newsChannel.send("@everyone please welcome <@!%s> to the clan!" % user.id)
+	await bot.newsChannel.send("@everyone please welcome <@!%s> to the clan!" % user.id)
 
 
 @bot.command()
@@ -206,7 +207,7 @@ async def promote(ctx, user: discord.User):
 		else:
 			await user.edit(roles=[newRoleID])
 
-		await newsChannel.send("<@!%s> has been promoted to %s!" % (user.id, newRoleName))
+		await bot.newsChannel.send("<@!%s> has been promoted to %s!" % (user.id, newRoleName))
 
 		await modLog("Promotion", "<@!{}> was promoted to {} by {}"
 		             .format(user.id, user.top_role, ctx.author.display_name), ctx)
@@ -244,7 +245,7 @@ async def names(ctx):
 async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
-	if ctx.channel == botChannel:
+	if ctx.channel == bot.botChannel:
 		hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
 		separatedStats = hiscoreLookup.text.split("\n")
 
@@ -261,14 +262,14 @@ async def stats(ctx, *, message: str):
 		await ctx.channel.send(embed=statEmbed)
 	else:
 		await ctx.channel.send(
-			"You can only run this command in {}".format(botChannel.mention))
+			"You can only run this command in {}".format(bot.botChannel.mention))
 
 
 @bot.command()
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
 
-	if ctx.channel == botChannel:
+	if ctx.channel == bot.botChannel:
 		hcimLookup = requests.get(
 			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
 		separatedStats = hcimLookup.text.split("\n")
@@ -300,7 +301,7 @@ async def hcim(ctx, *, message: str):
 			await ctx.channel.send(embed=HCIMStatusEmbed)
 	else:
 		await ctx.channel.send(
-			"You can only run this command in {}".format(botChannel.mention))
+			"You can only run this command in {}".format(bot.botChannel.mention))
 
 
 bot.run(botToken)
