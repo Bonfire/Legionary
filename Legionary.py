@@ -41,7 +41,7 @@ async def on_ready():
 	bot.logChannel = bot.get_channel(515702280063025171)
 	bot.newsChannel = bot.get_channel(515684275580960769)
 	bot.agreeChannel = bot.get_channel(515688016207937585)
-	bot.botChannel = bot.get_channel(516107373538967563)
+	bot.botChannel = bot.get_channel(516433581992706058)
 
 
 @bot.command()
