@@ -1,8 +1,8 @@
 import math
 import platform
 
+import aiohttp
 import discord
-import requests
 from discord.ext import commands
 from lxml import html
 
@@ -127,7 +127,9 @@ async def on_member_join(user: discord.User):
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
 	await user.send(embed=recruitmentEmbed)
-	await modLog("Join", "{} (ID: {}) has joined the server. A recruitment message has been sent.".format(user.display_name, user.id))
+	await modLog("Join",
+	             "{} (ID: {}) has joined the server. A recruitment message has been sent.".format(user.display_name,
+	                                                                                              user.id))
 	addMember(user)
 
 
@@ -245,22 +247,23 @@ async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
 	if ctx.channel == bot.botChannel:
-		hiscoreLookup = requests.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message)
-		separatedStats = hiscoreLookup.text.split("\n")
+		async with aiohttp.ClientSession() as session:
+			async with session.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message) as hiscoreLookup:
+				separatedStats = (await hiscoreLookup.text()).split("\n")
 
-		statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
+			statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
 
-		statDesc = "Stats for {}".format(message) + "\n (Level, XP) \n"
-		for stat in range(0, 23):
-			statName = statNames[stat]
-			statLevel = separatedStats[stat].split(",")[1]
-			statXP = separatedStats[stat].split(",")[2]
-			statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
+			statDesc = "Stats for {}".format(message) + "\n (Level, XP) \n"
+			for stat in range(0, 23):
+				statName = statNames[stat]
+				statLevel = separatedStats[stat].split(",")[1]
+				statXP = separatedStats[stat].split(",")[2]
+				statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
 
-		statEmbed.description = statDesc
-		statEmbed.set_footer(icon_url=ctx.author.avatar_url,
-		                     text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
-		await ctx.channel.send(embed=statEmbed)
+			statEmbed.description = statDesc
+			statEmbed.set_footer(icon_url=ctx.author.avatar_url,
+			                     text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
+			await ctx.channel.send(embed=statEmbed)
 	else:
 		await ctx.channel.send(
 			"You can only run this command in {}".format(bot.botChannel.mention))
@@ -271,37 +274,39 @@ async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
 
 	if ctx.channel == bot.botChannel:
-		hcimLookup = requests.get(
-			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message)
-		separatedStats = hcimLookup.text.split("\n")
-		overallScore = int(separatedStats[0].split(",")[0])
-		skillTotal = int(separatedStats[0].split(",")[1])
-		scorePageNum = math.ceil(overallScore / 25)
+		async with aiohttp.ClientSession() as session:
+			async with session.get(
+					"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message) as hcimLookup:
+				separatedStats = (await hcimLookup.text()).split("\n")
+				overallScore = int(separatedStats[0].split(",")[0])
+				skillTotal = int(separatedStats[0].split(",")[1])
+				scorePageNum = math.ceil(overallScore / 25)
 
-		scorePageHTML = requests.get(
-			"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(
-				scorePageNum)).content
-		scorePageTree = html.fromstring(scorePageHTML)
+			async with session.get(
+					"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(
+							scorePageNum)) as scorePageHTML:
+				scorePageTree = html.fromstring(await scorePageHTML.text())
 
-		playerScores = scorePageTree.xpath(
-			'//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
-		playerScores = [name.replace('\xa0', ' ') for name in playerScores]
+				playerScores = scorePageTree.xpath(
+					'//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
+				playerScores = [name.replace('\xa0', ' ') for name in playerScores]
 
-		if message in playerScores:
-			HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
-			HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "\n"
-			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
-				" ", "%20") + ")"
-			await ctx.channel.send(embed=HCIMStatusEmbed)
-		else:
-			HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
-			HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
-				overallScore) + ", skill total of " + str(skillTotal) + "\n"
-			HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
-				" ", "%20") + ")"
-			HCIMStatusEmbed.set_footer(icon_url=ctx.author.avatar_url,
-			                           text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
-			await ctx.channel.send(embed=HCIMStatusEmbed)
+				if message in playerScores:
+					HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
+					HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "\n"
+					HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
+						" ", "%20") + ")"
+					await ctx.channel.send(embed=HCIMStatusEmbed)
+				else:
+					HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
+					HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
+						overallScore) + ", skill total of " + str(skillTotal) + "\n"
+					HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
+						" ", "%20") + ")"
+					HCIMStatusEmbed.set_footer(icon_url=ctx.author.avatar_url,
+					                           text="Requested by {} (ID: {})".format(ctx.author.display_name,
+					                                                                  ctx.author.id))
+					await ctx.channel.send(embed=HCIMStatusEmbed)
 	else:
 		await ctx.channel.send(
 			"You can only run this command in {}".format(bot.botChannel.mention))
