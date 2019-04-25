@@ -79,18 +79,18 @@ async def help(ctx, *args):
 	await modLog("Help", "<@!{}> has requested the commands list".format(ctx.author.id), ctx)
 
 
-def addMember(user: discord.User):
+def addMember(member: discord.Member):
 	"""Adds a new user to the members list"""
 
-	newMember = {'name': user.display_name, 'id': user.id, 'role': user.top_role.name}
+	newMember = {'name': member.display_name, 'id': member.id, 'role': member.top_role.name}
 	membersList.append(dict(newMember))
 
 
-def removeMember(user: discord.User):
+def removeMember(member: discord.Member):
 	"""Searches the members list for a specific member and removes them"""
 
 	for memberData in membersList:
-		if memberData['name'] == user.display_name:
+		if memberData['name'] == member.display_name:
 			membersList.remove(memberData)
 
 
@@ -127,38 +127,38 @@ async def on_member_join(user: discord.User):
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
 	await user.send(embed=recruitmentEmbed)
-	await modLog("Join", "<@!{}> has joined the server. A recruitment message has been sent.".format(user.id))
+	await modLog("Join", "{} (ID: {}) has joined the server. A recruitment message has been sent.".format(user.display_name, user.id))
 	addMember(user)
 
 
 @bot.event
-async def on_member_remove(user: discord.Member):
+async def on_member_remove(member: discord.Member):
 	"""Removes members who leave the server from the members list"""
 
-	removeMember(user)
-	await modLog("Leave", "{} (<@!{}>) has left the server".format(user.display_name, user.id))
+	removeMember(member)
+	await modLog("Leave", "{} (<@!{}>) has left the server".format(member.display_name, member.id))
 
 
 @bot.event
-async def on_member_update(oldUserInfo: discord.User, newUserInfo: discord.User):
+async def on_member_update(oldMemberInfo: discord.Member, newMemberInfo: discord.Member):
 	"""
 	Updates member data in the members list
 	Will update names, promotions, demotions, and recruitment
 	"""
 
-	if oldUserInfo.display_name != newUserInfo.display_name:
-		if oldUserInfo.display_name != '@everyone':
-			removeMember(oldUserInfo)
-			addMember(oldUserInfo)
+	if oldMemberInfo.display_name != newMemberInfo.display_name:
+		if oldMemberInfo.display_name != '@everyone':
+			removeMember(oldMemberInfo)
+			addMember(oldMemberInfo)
 			await modLog("Name Change", "{} has changed their name to <@!{}>"
-			             .format(oldUserInfo.display_name, newUserInfo.id))
+			             .format(oldMemberInfo.display_name, newMemberInfo.id))
 
-	if oldUserInfo.top_role != newUserInfo.top_role:
-		if oldUserInfo.top_role.name != '@everyone':
-			removeMember(oldUserInfo)
-			addMember(newUserInfo)
+	if oldMemberInfo.top_role != newMemberInfo.top_role:
+		if oldMemberInfo.top_role.name != '@everyone':
+			removeMember(oldMemberInfo)
+			addMember(newMemberInfo)
 			await modLog("Rank Change", "<@!{}> had their rank changed from {} to {}"
-			             .format(oldUserInfo.id, oldUserInfo.top_role.name, newUserInfo.top_role.name))
+			             .format(oldMemberInfo.id, oldMemberInfo.top_role.name, newMemberInfo.top_role.name))
 
 
 @bot.command()
@@ -167,7 +167,7 @@ async def agree(ctx):
 
 	if ctx.channel == bot.agreeChannel:
 		recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
-		await ctx.author.add_roles(roles=recruitRoleID)
+		await ctx.author.add_roles(recruitRoleID)
 		await bot.newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.author.id)
 		await modLog("Agreement", "<@!{}> has agreed to the handbook"
 		             .format(ctx.author.id), ctx)
@@ -175,21 +175,21 @@ async def agree(ctx):
 
 @bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
-async def recruit(ctx, user: discord.User):
+async def recruit(ctx, member: discord.Member):
 	"""This can be called to manually recruit new members"""
 
 	recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
-	await user.add_roles(roles=recruitRoleID)
-	await bot.newsChannel.send("@everyone please welcome <@!%s> to the clan!" % user.id)
+	await member.add_roles(recruitRoleID)
+	await bot.newsChannel.send("@everyone please welcome <@!%s> to the clan!" % member.id)
 
 
 @bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
-async def promote(ctx, user: discord.User):
+async def promote(ctx, member: discord.Member):
 	"""This can be called to manually promote members"""
 
-	currentRole = user.top_role
-	if currentRole.name != 'Owner' and user.display_name != '@everyone':
+	currentRole = member.top_role
+	if currentRole.name != 'Owner' and member.display_name != '@everyone':
 		newRoleNumber = legionRoles.index(currentRole.name) + 1
 		newRoleName = legionRoles[newRoleNumber]
 
@@ -199,28 +199,28 @@ async def promote(ctx, user: discord.User):
 		# Make sure we give the higher roles their moderator statuses
 		if newRoleName == 'Lieutenant':
 			modRoleID = discord.utils.get(ctx.guild.roles, name="Moderator")
-			await user.edit(roles=[newRoleID, modRoleID])
+			await member.edit(roles=[newRoleID, modRoleID])
 		elif newRoleName == 'General' or newRoleName == 'Captain':
 			globalRoleID = discord.utils.get(ctx.guild.roles, name="Global Moderator")
-			await user.edit(roles=[newRoleID, globalRoleID])
+			await member.edit(roles=[newRoleID, globalRoleID])
 		else:
-			await user.edit(roles=[newRoleID])
+			await member.edit(roles=[newRoleID])
 
-		await bot.newsChannel.send("<@!%s> has been promoted to %s!" % (user.id, newRoleName))
+		await bot.newsChannel.send("<@!%s> has been promoted to %s!" % (member.id, newRoleName))
 
 		await modLog("Promotion", "<@!{}> was promoted to {} by {}"
-		             .format(user.id, user.top_role, ctx.author.display_name), ctx)
+		             .format(member.id, member.top_role, ctx.author.display_name), ctx)
 
 
 @bot.command()
 @commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
-async def kick(ctx, user: discord.User):
+async def kick(ctx, member: discord.Member):
 	"""This is used to remove players from the clan and members list"""
 
-	removeMember(user)
-	await user.kick()
+	removeMember(member)
+	await member.kick()
 	await modLog("Kick", "{} was removed from the server files and kicked"
-	             .format(user.display_name), ctx)
+	             .format(member.display_name), ctx)
 
 
 @bot.command()
