@@ -1,4 +1,5 @@
 import math
+import os
 import platform
 
 import aiohttp
@@ -65,6 +66,9 @@ async def help(ctx, *args):
 	                        inline=False)
 	commandsEmbed.add_field(name="!names",
 	                        value='Uploads the name of all current clan members. (Captain+)',
+	                        inline=False)
+	commandsEmbed.add_field(name="!ranks",
+	                        value='Uploads the name of all current clan members, their ranks, and join date. (Captain+)',
 	                        inline=False)
 	commandsEmbed.add_field(name="!stats <name>",
 	                        value='Looks up that RSN\'s stats.',
@@ -237,9 +241,30 @@ async def names(ctx):
 				namesFile.write(person.display_name + "\n")
 	namesFile.close()
 	await ctx.message.channel.send(file=discord.File("Names.txt"))
+	os.remove("Names.txt")
 
-	await modLog("Names", "<@!{}> has requested the names list"
-	             .format(ctx.author.id), ctx)
+	await modLog("Names", "<@!{}> has requested the names list".format(ctx.author.id), ctx)
+
+
+@bot.command()
+@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
+async def ranks(ctx):
+	"""Will send a list of all current members and their ranks"""
+
+	with open("Ranks.txt", "w+") as ranksFile:
+		roles = ctx.guild.roles
+		members = ctx.guild.members
+		for role in roles:
+			if role.name is not "Guest" and role.name != "@everyone":
+				for member in members:
+					if member.top_role == role and member.bot is False:
+						ranksFile.write(
+							"{:>20} {:>20} {:>20}\n".format(member.display_name, role.name, str(member.joined_at)))
+	ranksFile.close()
+	await ctx.message.channel.send(file=discord.File("Ranks.txt"))
+	os.remove("Ranks.txt")
+
+	await modLog("Ranks", "<@!{}> has requested the ranks list".format(ctx.author.id), ctx)
 
 
 @bot.command()
@@ -248,7 +273,8 @@ async def stats(ctx, *, message: str):
 
 	if ctx.channel == bot.botChannel:
 		async with aiohttp.ClientSession() as session:
-			async with session.get("https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message) as hiscoreLookup:
+			async with session.get(
+					"https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message) as hiscoreLookup:
 				separatedStats = (await hiscoreLookup.text()).split("\n")
 
 			statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
@@ -284,7 +310,7 @@ async def hcim(ctx, *, message: str):
 
 			async with session.get(
 					"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(
-							scorePageNum)) as scorePageHTML:
+						scorePageNum)) as scorePageHTML:
 				scorePageTree = html.fromstring(await scorePageHTML.text())
 
 				playerScores = scorePageTree.xpath(
