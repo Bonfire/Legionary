@@ -236,7 +236,7 @@ async def names(ctx):
 			if person.bot is False and person.top_role.name != "Guest" and person.top_role.name != "@everyone":
 				namesFile.write(person.display_name + "\n")
 	namesFile.close()
-	await bot.send_file(ctx.channel, "./Names.txt")
+	await ctx.message.channel.send(file=discord.File("Names.txt"))
 
 	await modLog("Names", "<@!{}> has requested the names list"
 	             .format(ctx.author.id), ctx)
