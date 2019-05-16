@@ -259,7 +259,7 @@ async def ranks(ctx):
 				for member in members:
 					if member.top_role == role and member.bot is False:
 						ranksFile.write(
-							"{:>20} {:>20} {:>20}\n".format(member.display_name, role.name, str(member.joined_at)))
+							"{:<20} {:^20} {:>20}\n".format(member.display_name, role.name, str(member.joined_at)))
 	ranksFile.close()
 	await ctx.message.channel.send(file=discord.File("Ranks.txt"))
 	os.remove("Ranks.txt")
