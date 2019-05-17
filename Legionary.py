@@ -1,7 +1,7 @@
+import json
 import math
 import os
 import platform
-import json
 
 import aiohttp
 import discord
@@ -323,7 +323,8 @@ async def hcim(ctx, *, message: str):
 
 				if message in playerScores:
 					HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
-					HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(skillTotal) + "(btw)" + "\n"
+					HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(
+						skillTotal) + "(btw)" + "\n"
 					HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
 						" ", "%20") + ")"
 					await ctx.channel.send(embed=HCIMStatusEmbed)
@@ -351,26 +352,36 @@ async def price(ctx, *, itemName: str):
 		async with aiohttp.ClientSession() as session:
 			async with session.get(priceAPI) as priceJSON:
 				jsonData = json.loads(await priceJSON.text())
-				for item,itemData in jsonData.items():
+				for item, itemData in jsonData.items():
+					print("test")
 					if itemData["name"].lower() == itemName.lower():
 						itemPriceEmbed = discord.Embed(title="Price Lookup for " + itemName, color=0xf1c40f)
-						itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(itemData["buy_average"]), inline=True)
-						itemPriceEmbed.add_field(name="Selling Average", value="{:,} GP".format(itemData["sell_average"]), inline=True)
-						itemPriceEmbed.add_field(name="Overall Average", value="{:,} GP".format(itemData["overall_average"]), inline=True)
+						itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(itemData["buy_average"]),
+						                         inline=True)
+						itemPriceEmbed.add_field(name="Selling Average",
+						                         value="{:,} GP".format(itemData["sell_average"]), inline=True)
+						itemPriceEmbed.add_field(name="Overall Average",
+						                         value="{:,} GP".format(itemData["overall_average"]), inline=True)
 
 						itemPriceEmbed.add_field(name="Buying Quantity", value=itemData["buy_quantity"], inline=True)
 						itemPriceEmbed.add_field(name="Selling Quantity", value=itemData["sell_quantity"], inline=True)
-						itemPriceEmbed.add_field(name="Overall Quantity", value=itemData["overall_quantity"], inline=True)
+						itemPriceEmbed.add_field(name="Overall Quantity", value=itemData["overall_quantity"],
+						                         inline=True)
 
-						itemPriceEmbed.add_field(name="Members Item", value=str(itemData["members"]).capitalize(), inline=True)
+						itemPriceEmbed.add_field(name="Members Item", value=str(itemData["members"]).capitalize(),
+						                         inline=True)
 						itemPriceEmbed.add_field(name="Item ID", value=itemData["id"], inline=True)
-						itemPriceEmbed.add_field(name="Store Value", value="{:,} GP".format(itemData["sp"]), inline=True)
+						itemPriceEmbed.add_field(name="Store Value", value="{:,} GP".format(itemData["sp"]),
+						                         inline=True)
 
 						itemPriceEmbed.set_footer(icon_url=ctx.author.avatar_url,
-						                     text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
+						                          text="Requested by {} (ID: {})".format(ctx.author.display_name,
+						                                                                 ctx.author.id))
 
 						await ctx.channel.send(embed=itemPriceEmbed)
-
+	else:
+		await ctx.channel.send(
+			"You can only run this command in {}".format(bot.botChannel.mention))
 
 
 bot.run(botToken)
