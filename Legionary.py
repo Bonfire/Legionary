@@ -318,14 +318,14 @@ async def hcim(ctx, *, message: str):
 			if message in playerScores:
 				HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
 				HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(
-					skillTotal) + "(btw)" + "\n"
+					skillTotal) + " (btw)" + "\n"
 				HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
 					" ", "%20") + ")"
 				await ctx.channel.send(embed=HCIMStatusEmbed)
 			else:
 				HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
 				HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
-					overallScore) + ", skill total of " + str(skillTotal) + "(btw)" + "\n"
+					overallScore) + ", skill total of " + str(skillTotal) + " (btw)" + "\n"
 				HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
 					" ", "%20") + ")"
 				HCIMStatusEmbed.set_footer(icon_url=ctx.author.avatar_url,
