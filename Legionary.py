@@ -275,113 +275,101 @@ async def ranks(ctx):
 async def stats(ctx, *, message: str):
 	"""Will display a list of a player's stats"""
 
-	if ctx.channel == bot.botChannel:
-		async with aiohttp.ClientSession() as session:
-			async with session.get(
-					"https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message) as hiscoreLookup:
-				separatedStats = (await hiscoreLookup.text()).split("\n")
+	async with aiohttp.ClientSession() as session:
+		async with session.get(
+				"https://secure.runescape.com/m=hiscore_oldschool/index_lite.ws?player=" + message) as hiscoreLookup:
+			separatedStats = (await hiscoreLookup.text()).split("\n")
 
-			statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
+		statEmbed = discord.Embed(title="Stats for " + message, color=0x2ecc71)
 
-			statDesc = "Stats for {}".format(message) + "\n (Level, XP) \n"
-			for stat in range(0, 23):
-				statName = statNames[stat]
-				statLevel = separatedStats[stat].split(",")[1]
-				statXP = separatedStats[stat].split(",")[2]
-				statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
+		statDesc = "Stats for {}".format(message) + "\n (Level, XP) \n"
+		for stat in range(0, 23):
+			statName = statNames[stat]
+			statLevel = separatedStats[stat].split(",")[1]
+			statXP = separatedStats[stat].split(",")[2]
+			statDesc += statName + ": " + statLevel + ", " + statXP + "\n"
 
-			statEmbed.description = statDesc
-			statEmbed.set_footer(icon_url=ctx.author.avatar_url,
-			                     text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
-			await ctx.channel.send(embed=statEmbed)
-	else:
-		await ctx.channel.send(
-			"You can only run this command in {}".format(bot.botChannel.mention))
+		statEmbed.description = statDesc
+		statEmbed.set_footer(icon_url=ctx.author.avatar_url,
+		                     text="Requested by {} (ID: {})".format(ctx.author.display_name, ctx.author.id))
+		await ctx.channel.send(embed=statEmbed)
 
 
 @bot.command()
 async def hcim(ctx, *, message: str):
 	"""Will look up, add or remove HCIM player tracking"""
 
-	if ctx.channel == bot.botChannel:
-		async with aiohttp.ClientSession() as session:
-			async with session.get(
-					"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message) as hcimLookup:
-				separatedStats = (await hcimLookup.text()).split("\n")
-				overallScore = int(separatedStats[0].split(",")[0])
-				skillTotal = int(separatedStats[0].split(",")[1])
-				scorePageNum = math.ceil(overallScore / 25)
+	async with aiohttp.ClientSession() as session:
+		async with session.get(
+				"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/index_lite.ws?player=" + message) as hcimLookup:
+			separatedStats = (await hcimLookup.text()).split("\n")
+			overallScore = int(separatedStats[0].split(",")[0])
+			skillTotal = int(separatedStats[0].split(",")[1])
+			scorePageNum = math.ceil(overallScore / 25)
 
-			async with session.get(
-					"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(
-						scorePageNum)) as scorePageHTML:
-				scorePageTree = html.fromstring(await scorePageHTML.text())
+		async with session.get(
+				"https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/overall.ws?table=0&page=" + str(
+					scorePageNum)) as scorePageHTML:
+			scorePageTree = html.fromstring(await scorePageHTML.text())
 
-				playerScores = scorePageTree.xpath(
-					'//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
-				playerScores = [name.replace('\xa0', ' ') for name in playerScores]
+			playerScores = scorePageTree.xpath(
+				'//tr[@class="personal-hiscores__row personal-hiscores__row--dead"]/td[2]/a/text()')
+			playerScores = [name.replace('\xa0', ' ') for name in playerScores]
 
-				if message in playerScores:
-					HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
-					HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(
-						skillTotal) + "(btw)" + "\n"
-					HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
-						" ", "%20") + ")"
-					await ctx.channel.send(embed=HCIMStatusEmbed)
-				else:
-					HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
-					HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
-						overallScore) + ", skill total of " + str(skillTotal) + "(btw)" + "\n"
-					HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
-						" ", "%20") + ")"
-					HCIMStatusEmbed.set_footer(icon_url=ctx.author.avatar_url,
-					                           text="Requested by {} (ID: {})".format(ctx.author.display_name,
-					                                                                  ctx.author.id))
-					await ctx.channel.send(embed=HCIMStatusEmbed)
-	else:
-		await ctx.channel.send(
-			"You can only run this command in {}".format(bot.botChannel.mention))
+			if message in playerScores:
+				HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0xff0000)
+				HCIMStatusEmbed.description = "Player is dead! Final skill total of " + str(
+					skillTotal) + "(btw)" + "\n"
+				HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
+					" ", "%20") + ")"
+				await ctx.channel.send(embed=HCIMStatusEmbed)
+			else:
+				HCIMStatusEmbed = discord.Embed(title="HCIM Status for " + message, color=0x00ff00)
+				HCIMStatusEmbed.description = "Player is alive with a hiscore position of " + str(
+					overallScore) + ", skill total of " + str(skillTotal) + "(btw)" + "\n"
+				HCIMStatusEmbed.description += "[Link to Profile](https://secure.runescape.com/m=hiscore_oldschool_hardcore_ironman/hiscorepersonal.ws?user1=" + message.replace(
+					" ", "%20") + ")"
+				HCIMStatusEmbed.set_footer(icon_url=ctx.author.avatar_url,
+				                           text="Requested by {} (ID: {})".format(ctx.author.display_name,
+				                                                                  ctx.author.id))
+				await ctx.channel.send(embed=HCIMStatusEmbed)
 
 
 @bot.command()
 async def price(ctx, *, itemName: str):
 	"""Uses the RSBuddy API to fetch item prices"""
 
-	if ctx.channel == bot.botChannel:
-		priceAPI = "https://rsbuddy.com/exchange/summary.json"
-		async with aiohttp.ClientSession() as session:
-			async with session.get(priceAPI) as priceJSON:
-				jsonData = json.loads(await priceJSON.text())
-				for item, itemData in jsonData.items():
-					print("test")
-					if itemData["name"].lower() == itemName.lower():
-						itemPriceEmbed = discord.Embed(title="Price Lookup for " + itemName, color=0xf1c40f)
-						itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(itemData["buy_average"]),
-						                         inline=True)
-						itemPriceEmbed.add_field(name="Selling Average",
-						                         value="{:,} GP".format(itemData["sell_average"]), inline=True)
-						itemPriceEmbed.add_field(name="Overall Average",
-						                         value="{:,} GP".format(itemData["overall_average"]), inline=True)
+	priceAPI = "https://rsbuddy.com/exchange/summary.json"
+	async with aiohttp.ClientSession() as session:
+		async with session.get(priceAPI) as priceJSON:
+			jsonData = json.loads(await priceJSON.text())
+			for item, itemData in jsonData.items():
+				print("test")
+				if itemData["name"].lower() == itemName.lower():
+					itemPriceEmbed = discord.Embed(title="Price Lookup for " + itemName, color=0xf1c40f)
+					itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(itemData["buy_average"]),
+					                         inline=True)
+					itemPriceEmbed.add_field(name="Selling Average",
+					                         value="{:,} GP".format(itemData["sell_average"]), inline=True)
+					itemPriceEmbed.add_field(name="Overall Average",
+					                         value="{:,} GP".format(itemData["overall_average"]), inline=True)
 
-						itemPriceEmbed.add_field(name="Buying Quantity", value=itemData["buy_quantity"], inline=True)
-						itemPriceEmbed.add_field(name="Selling Quantity", value=itemData["sell_quantity"], inline=True)
-						itemPriceEmbed.add_field(name="Overall Quantity", value=itemData["overall_quantity"],
-						                         inline=True)
+					itemPriceEmbed.add_field(name="Buying Quantity", value=itemData["buy_quantity"], inline=True)
+					itemPriceEmbed.add_field(name="Selling Quantity", value=itemData["sell_quantity"], inline=True)
+					itemPriceEmbed.add_field(name="Overall Quantity", value=itemData["overall_quantity"],
+					                         inline=True)
 
-						itemPriceEmbed.add_field(name="Members Item", value=str(itemData["members"]).capitalize(),
-						                         inline=True)
-						itemPriceEmbed.add_field(name="Item ID", value=itemData["id"], inline=True)
-						itemPriceEmbed.add_field(name="Store Value", value="{:,} GP".format(itemData["sp"]),
-						                         inline=True)
+					itemPriceEmbed.add_field(name="Members Item", value=str(itemData["members"]).capitalize(),
+					                         inline=True)
+					itemPriceEmbed.add_field(name="Item ID", value=itemData["id"], inline=True)
+					itemPriceEmbed.add_field(name="Store Value", value="{:,} GP".format(itemData["sp"]),
+					                         inline=True)
 
-						itemPriceEmbed.set_footer(icon_url=ctx.author.avatar_url,
-						                          text="Requested by {} (ID: {})".format(ctx.author.display_name,
-						                                                                 ctx.author.id))
+					itemPriceEmbed.set_footer(icon_url=ctx.author.avatar_url,
+					                          text="Requested by {} (ID: {})".format(ctx.author.display_name,
+					                                                                 ctx.author.id))
 
-						await ctx.channel.send(embed=itemPriceEmbed)
-	else:
-		await ctx.channel.send(
-			"You can only run this command in {}".format(bot.botChannel.mention))
+					await ctx.channel.send(embed=itemPriceEmbed)
 
 
 bot.run(botToken)
