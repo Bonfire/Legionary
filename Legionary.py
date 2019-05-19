@@ -344,7 +344,7 @@ async def price(ctx, *, itemName: str):
 			jsonData = json.loads(await priceJSON.text())
 			for item, itemData in jsonData.items():
 				if itemName.lower() in itemData["name"].lower():
-					itemPriceEmbed = discord.Embed(title="Price Lookup for " + itemName, color=0xf1c40f)
+					itemPriceEmbed = discord.Embed(title="Price Lookup for " + itemData["name"], color=0xf1c40f)
 					itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(itemData["buy_average"]),
 					                         inline=True)
 					itemPriceEmbed.add_field(name="Selling Average",
@@ -368,6 +368,7 @@ async def price(ctx, *, itemName: str):
 					                                                                 ctx.author.id))
 
 					await ctx.channel.send(embed=itemPriceEmbed)
+					break
 
 
 bot.run(botToken)
