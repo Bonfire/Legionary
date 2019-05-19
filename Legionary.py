@@ -347,8 +347,8 @@ async def price(ctx, *, itemName: str):
 			closestMatchRatio = 0
 			closestItemID = -1
 			for item, itemData in jsonData.items():
-				ratioMatch = fuzz.token_set_ratio(itemName,itemData["name"])
-				if ratioMatch >= closestMatchRatio:
+				ratioMatch = fuzz.token_sort_ratio(itemName,itemData["name"])
+				if ratioMatch > closestMatchRatio:
 					closestMatchRatio = ratioMatch
 					closestItemID = item
 
