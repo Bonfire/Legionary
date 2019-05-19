@@ -343,7 +343,7 @@ async def price(ctx, *, itemName: str):
 		async with session.get(priceAPI) as priceJSON:
 			jsonData = json.loads(await priceJSON.text())
 			for item, itemData in jsonData.items():
-				if itemData["name"].lower() == itemName.lower():
+				if itemName.lower() in itemData["name"].lower():
 					itemPriceEmbed = discord.Embed(title="Price Lookup for " + itemName, color=0xf1c40f)
 					itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(itemData["buy_average"]),
 					                         inline=True)
