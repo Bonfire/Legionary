@@ -7,6 +7,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 from lxml import html
+from fuzzywuzzy import fuzz
 
 # Discord Bot Token
 from tokenFile import botToken
@@ -342,33 +343,42 @@ async def price(ctx, *, itemName: str):
 	async with aiohttp.ClientSession() as session:
 		async with session.get(priceAPI) as priceJSON:
 			jsonData = json.loads(await priceJSON.text())
+
+			closestMatchRatio = 0
+			closestItemID = -1
 			for item, itemData in jsonData.items():
-				if itemName.lower() in itemData["name"].lower():
-					itemPriceEmbed = discord.Embed(title="Price Lookup for " + itemData["name"], color=0xf1c40f)
-					itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(itemData["buy_average"]),
-					                         inline=True)
-					itemPriceEmbed.add_field(name="Selling Average",
-					                         value="{:,} GP".format(itemData["sell_average"]), inline=True)
-					itemPriceEmbed.add_field(name="Overall Average",
-					                         value="{:,} GP".format(itemData["overall_average"]), inline=True)
+				ratioMatch = fuzz.token_set_ratio(itemName,itemData["name"])
+				if ratioMatch >= closestMatchRatio:
+					closestMatchRatio = ratioMatch
+					closestItemID = item
 
-					itemPriceEmbed.add_field(name="Buying Quantity", value=itemData["buy_quantity"], inline=True)
-					itemPriceEmbed.add_field(name="Selling Quantity", value=itemData["sell_quantity"], inline=True)
-					itemPriceEmbed.add_field(name="Overall Quantity", value=itemData["overall_quantity"],
-					                         inline=True)
+			if closestItemID != -1:
+				itemPriceEmbed = discord.Embed(title="Price Lookup for " + jsonData[closestItemID]["name"], color=0xf1c40f)
+				itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(jsonData[closestItemID]["buy_average"]),
+				                         inline=True)
+				itemPriceEmbed.add_field(name="Selling Average",
+				                         value="{:,} GP".format(jsonData[closestItemID]["sell_average"]), inline=True)
+				itemPriceEmbed.add_field(name="Overall Average",
+				                         value="{:,} GP".format(jsonData[closestItemID]["overall_average"]), inline=True)
 
-					itemPriceEmbed.add_field(name="Members Item", value=str(itemData["members"]).capitalize(),
-					                         inline=True)
-					itemPriceEmbed.add_field(name="Item ID", value=itemData["id"], inline=True)
-					itemPriceEmbed.add_field(name="Store Value", value="{:,} GP".format(itemData["sp"]),
-					                         inline=True)
+				itemPriceEmbed.add_field(name="Buying Quantity", value=jsonData[closestItemID]["buy_quantity"], inline=True)
+				itemPriceEmbed.add_field(name="Selling Quantity", value=jsonData[closestItemID]["sell_quantity"], inline=True)
+				itemPriceEmbed.add_field(name="Overall Quantity", value=jsonData[closestItemID]["overall_quantity"],
+				                         inline=True)
 
-					itemPriceEmbed.set_footer(icon_url=ctx.author.avatar_url,
-					                          text="Requested by {} (ID: {})".format(ctx.author.display_name,
-					                                                                 ctx.author.id))
+				itemPriceEmbed.add_field(name="Members Item", value=str(jsonData[closestItemID]["members"]).capitalize(),
+				                         inline=True)
+				itemPriceEmbed.add_field(name="Item ID", value=jsonData[closestItemID]["id"], inline=True)
+				itemPriceEmbed.add_field(name="Store Value", value="{:,} GP".format(jsonData[closestItemID]["sp"]),
+				                         inline=True)
 
-					await ctx.channel.send(embed=itemPriceEmbed)
-					break
+				itemPriceEmbed.set_footer(icon_url=ctx.author.avatar_url,
+				                          text="Requested by {} (ID: {})".format(ctx.author.display_name,
+				                                                                 ctx.author.id))
+
+				await ctx.channel.send(embed=itemPriceEmbed)
+			else:
+				await ctx.channel.send("Item not found!")
 
 
 bot.run(botToken)

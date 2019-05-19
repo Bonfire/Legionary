@@ -8,6 +8,8 @@ discord-py = "==1.1.1"
 asyncio = "*"
 requests = "*"
 lxml = "*"
+fuzzywuzzy = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 
