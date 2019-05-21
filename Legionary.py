@@ -6,8 +6,8 @@ import platform
 import aiohttp
 import discord
 from discord.ext import commands
-from lxml import html
 from fuzzywuzzy import fuzz
+from lxml import html
 
 # Discord Bot Token
 from tokenFile import botToken
@@ -131,7 +131,7 @@ async def on_member_join(user: discord.User):
 	                           value="Verify that you have changed your name on the server to your in-game name",
 	                           inline=False)
 	recruitmentEmbed.add_field(name="4. Agree to The Handbook",
-	                           value="Type \"!agree\" in the <#515688016207937585> channel when you have changed your name and agree to The Handbook",
+	                           value="Type `!agree @name` (where `name` is the name of the member who referred you) in the <#515688016207937585> channel when you have changed your name and agree to The Handbook.",
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
 	await user.send(embed=recruitmentEmbed)
@@ -172,15 +172,31 @@ async def on_member_update(oldMemberInfo: discord.Member, newMemberInfo: discord
 
 
 @bot.command()
-async def agree(ctx):
+async def agree(ctx, member: discord.Member):
 	"""This will recruit new members once they've agreed to the handbook"""
 
 	if ctx.channel == bot.agreeChannel:
-		recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
-		await ctx.author.add_roles(recruitRoleID)
-		await bot.newsChannel.send("@everyone please welcome <@!%s> to the clan!" % ctx.author.id)
-		await modLog("Agreement", "<@!{}> has agreed to the handbook"
-		             .format(ctx.author.id), ctx)
+		if member is not None and member.top_role.name is not "@everyone" and member.top_role.name is not "@here":
+			recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
+			await ctx.author.add_roles(recruitRoleID)
+			await bot.newsChannel.send(
+				"@everyone please welcome <@!{}> to the clan! Referred by <@!{}>".format(ctx.author.id, member.id))
+			await modLog("Agreement", "<@!{}> has agreed to the handbook. Referred by {}"
+			             .format(ctx.author.id, member.display_name), ctx)
+		else:
+			await ctx.channel.send(
+				"Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
+
+
+@agree.error
+async def agree_error(ctx, error):
+	if isinstance(error, commands.BadArgument):
+		await ctx.channel.send("Invalid arguments, please try again")
+		return
+
+	if isinstance(error, commands.MissingRequiredArgument):
+		await ctx.channel.send("Missing arguments, please try again")
+		return
 
 
 @bot.command()
@@ -347,26 +363,32 @@ async def price(ctx, *, itemName: str):
 			closestMatchRatio = 0
 			closestItemID = -1
 			for item, itemData in jsonData.items():
-				ratioMatch = fuzz.token_sort_ratio(itemName,itemData["name"])
+				ratioMatch = fuzz.token_sort_ratio(itemName, itemData["name"])
 				if ratioMatch > closestMatchRatio:
 					closestMatchRatio = ratioMatch
 					closestItemID = item
 
 			if closestItemID != -1:
-				itemPriceEmbed = discord.Embed(title="Price Lookup for " + jsonData[closestItemID]["name"], color=0xf1c40f)
-				itemPriceEmbed.add_field(name="Buying Average", value="{:,} GP".format(jsonData[closestItemID]["buy_average"]),
+				itemPriceEmbed = discord.Embed(title="Price Lookup for " + jsonData[closestItemID]["name"],
+				                               color=0xf1c40f)
+				itemPriceEmbed.add_field(name="Buying Average",
+				                         value="{:,} GP".format(jsonData[closestItemID]["buy_average"]),
 				                         inline=True)
 				itemPriceEmbed.add_field(name="Selling Average",
 				                         value="{:,} GP".format(jsonData[closestItemID]["sell_average"]), inline=True)
 				itemPriceEmbed.add_field(name="Overall Average",
-				                         value="{:,} GP".format(jsonData[closestItemID]["overall_average"]), inline=True)
+				                         value="{:,} GP".format(jsonData[closestItemID]["overall_average"]),
+				                         inline=True)
 
-				itemPriceEmbed.add_field(name="Buying Quantity", value=jsonData[closestItemID]["buy_quantity"], inline=True)
-				itemPriceEmbed.add_field(name="Selling Quantity", value=jsonData[closestItemID]["sell_quantity"], inline=True)
+				itemPriceEmbed.add_field(name="Buying Quantity", value=jsonData[closestItemID]["buy_quantity"],
+				                         inline=True)
+				itemPriceEmbed.add_field(name="Selling Quantity", value=jsonData[closestItemID]["sell_quantity"],
+				                         inline=True)
 				itemPriceEmbed.add_field(name="Overall Quantity", value=jsonData[closestItemID]["overall_quantity"],
 				                         inline=True)
 
-				itemPriceEmbed.add_field(name="Members Item", value=str(jsonData[closestItemID]["members"]).capitalize(),
+				itemPriceEmbed.add_field(name="Members Item",
+				                         value=str(jsonData[closestItemID]["members"]).capitalize(),
 				                         inline=True)
 				itemPriceEmbed.add_field(name="Item ID", value=jsonData[closestItemID]["id"], inline=True)
 				itemPriceEmbed.add_field(name="Store Value", value="{:,} GP".format(jsonData[closestItemID]["sp"]),
