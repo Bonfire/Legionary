@@ -53,8 +53,8 @@ async def help(ctx, *args):
 	commandsEmbed.add_field(name="!help",
 	                        value='Shows this help message.',
 	                        inline=False)
-	commandsEmbed.add_field(name="!agree",
-	                        value='Allows users to agree to the handbook.',
+	commandsEmbed.add_field(name="!agree <name>",
+	                        value='Allows users to agree to the handbook and refer <name>.',
 	                        inline=False)
 	commandsEmbed.add_field(name="!recruit <discord name>",
 	                        value='Manually recruits a user by name. (Captain+)',
@@ -191,11 +191,11 @@ async def agree(ctx, member: discord.Member):
 @agree.error
 async def agree_error(ctx, error):
 	if isinstance(error, commands.BadArgument):
-		await ctx.channel.send("Invalid arguments, please try again")
+		await ctx.channel.send("Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
 		return
 
 	if isinstance(error, commands.MissingRequiredArgument):
-		await ctx.channel.send("Missing arguments, please try again")
+		await ctx.channel.send("Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
 		return
 
 
