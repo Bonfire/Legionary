@@ -17,7 +17,7 @@ bot.remove_command("help")
 
 # List of members, list of roles, list of colors, and list of stat names
 membersList = []
-legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'General Emeritus', 'Owner']
+legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'General Emeritus', 'Leader']
 legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0xad1457, 0x2ecc71]
 statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 'Prayer', 'Magic', 'Cooking',
              'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
@@ -200,7 +200,7 @@ async def agree_error(ctx, error):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
+@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
 async def recruit(ctx, member: discord.Member):
 	"""This can be called to manually recruit new members"""
 
@@ -210,7 +210,7 @@ async def recruit(ctx, member: discord.Member):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
+@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
 async def promote(ctx, member: discord.Member):
 	"""This can be called to manually promote members"""
 
@@ -239,7 +239,7 @@ async def promote(ctx, member: discord.Member):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
+@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
 async def kick(ctx, member: discord.Member):
 	"""This is used to remove players from the clan and members list"""
 
@@ -250,7 +250,7 @@ async def kick(ctx, member: discord.Member):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
+@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
 async def names(ctx):
 	"""Will send a list of all current members in the discord"""
 
@@ -267,7 +267,7 @@ async def names(ctx):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Owner', 'General', 'General Emeritus')
+@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
 async def ranks(ctx):
 	"""Will send a list of all current members and their ranks"""
 
