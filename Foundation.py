@@ -1,3 +1,5 @@
+# Second Discord bot for a separate server. Tailored to that server's needs.
+
 import json
 import os
 import platform
@@ -11,15 +13,15 @@ from fuzzywuzzy import fuzz
 from lxml import html
 
 # Discord Bot Token
-from tokenFile import legionToken
+from tokenFile import foundationToken
 
-bot = commands.Bot(command_prefix="!")
+bot = commands.Bot(command_prefix="/")
 bot.remove_command("help")
 
 # List of members, list of roles, list of colors, and list of stat names
 membersList = []
-legionRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'General Emeritus', 'Leader']
-legionColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0xad1457, 0x2ecc71]
+foundationRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'MODERATOR']
+foundationColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0xad1457]
 statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 'Prayer', 'Magic', 'Cooking',
              'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
              'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
@@ -38,47 +40,47 @@ async def on_ready():
 	      .format(discord.__version__, platform.python_version()))
 
 	for server in bot.guilds:
-		if server.name == "Lost Legion":
+		if server.name == "FoundationOS":
 			for member in server.members:
 				addMember(member)
 
-	bot.logChannel = bot.get_channel(515702280063025171)
-	bot.newsChannel = bot.get_channel(515684275580960769)
-	bot.agreeChannel = bot.get_channel(515688016207937585)
+	bot.logChannel = bot.get_channel(615027803322187776)
+	bot.newsChannel = bot.get_channel(608027673213534256)
+	bot.agreeChannel = bot.get_channel(615028010751492145)
 
 
 @bot.command()
 async def help(ctx, *args):
-	commandsEmbed = discord.Embed(title="Legionary Bot Help - By Bonf", color=0xffea00)
-	commandsEmbed.description = "Type !<command> to run a command!"
-	commandsEmbed.add_field(name="!help",
+	commandsEmbed = discord.Embed(title="Foundation Bot Help - By Bonf", color=0xffea00)
+	commandsEmbed.description = "Type /<command> to run a command!"
+	commandsEmbed.add_field(name="/help",
 	                        value='Shows this help message.',
 	                        inline=False)
-	commandsEmbed.add_field(name="!agree <name>",
+	commandsEmbed.add_field(name="/agree <name>",
 	                        value='Allows users to agree to the handbook and refer <name>.',
 	                        inline=False)
-	commandsEmbed.add_field(name="!recruit <discord name>",
+	commandsEmbed.add_field(name="/recruit <discord name>",
 	                        value='Manually recruits a user by name. (Captain+)',
 	                        inline=False)
-	commandsEmbed.add_field(name="!promote <discord name>",
+	commandsEmbed.add_field(name="/promote <discord name>",
 	                        value='Manually promotes a user by name. (Captain+)',
 	                        inline=False)
-	commandsEmbed.add_field(name="!kick <discord name>",
+	commandsEmbed.add_field(name="/kick <discord name>",
 	                        value='Kicks a user from the server. (Captain+)',
 	                        inline=False)
-	commandsEmbed.add_field(name="!names",
+	commandsEmbed.add_field(name="/names",
 	                        value='Uploads the name of all current clan members. (Captain+)',
 	                        inline=False)
-	commandsEmbed.add_field(name="!ranks",
+	commandsEmbed.add_field(name="/ranks",
 	                        value='Uploads the name of all current clan members, their ranks, and join date. (Captain+)',
 	                        inline=False)
-	commandsEmbed.add_field(name="!stats <runescape name>",
+	commandsEmbed.add_field(name="/stats <runescape name>",
 	                        value='Looks up that RSN\'s stats.',
 	                        inline=False)
-	commandsEmbed.add_field(name="!hcim <runescape name>",
+	commandsEmbed.add_field(name="/hcim <runescape name>",
 	                        value='Looks up that RSN\'s HCIM stats and sees if they\'re dead or alive (btw)',
 	                        inline=False)
-	commandsEmbed.add_field(name="!price <item name>",
+	commandsEmbed.add_field(name="/price <item name>",
 	                        value='Does a price lookup on the input item.',
 	                        inline=False)
 	commandsEmbed.set_footer(icon_url=ctx.author.avatar_url,
@@ -121,18 +123,18 @@ async def on_member_join(user: discord.User):
 	Also adds them to the members list
 	"""
 
-	recruitmentEmbed = discord.Embed(title="Recruitment to OS Lost Legion", color=0xffea00)
-	recruitmentEmbed.description = "Thank you for showing interest in joining OS Lost Legion!\nI am a bot that will help walk you through the recruitment process\nPlease follow these steps to join:"
-	recruitmentEmbed.add_field(name="1. Read The Handbook",
-	                           value="Please view The Handbook located on the <#468933726894555136> channel",
+	recruitmentEmbed = discord.Embed(title="Recruitment to FoundationOS", color=0xffea00)
+	recruitmentEmbed.description = "Thank you for showing interest in joining FoundationOS!\nI am a bot that will help walk you through the recruitment process\nPlease follow these steps to join:"
+	recruitmentEmbed.add_field(name="1. Read The Rules",
+	                           value="Please view The Rules located on the <#608027489494630412> channel",
 	                           inline=False)
-	recruitmentEmbed.add_field(name="2. Read The Requirements",
-	                           value="Read and adhere to the requirements located on The Handbook", inline=False)
+	recruitmentEmbed.add_field(name="2. Review the Ranking System",
+	                           value="Please view the Ranking System by visiting the <#608399748101046313> channel", inline=False)
 	recruitmentEmbed.add_field(name="3. Change Your Name",
 	                           value="Verify that you have changed your name on the server to your in-game name",
 	                           inline=False)
-	recruitmentEmbed.add_field(name="4. Agree to The Handbook",
-	                           value="Type `!agree @name` (where `name` is the name of the member who referred you) in the <#515688016207937585> channel when you have changed your name and agree to The Handbook.",
+	recruitmentEmbed.add_field(name="4. Agree to The Rules",
+	                           value="Type `/agree @name` (where `name` is the name of the member who referred you) in the <#615028010751492145> channel when you have changed your name and agree to The Rules.",
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
 	await user.send(embed=recruitmentEmbed)
@@ -182,28 +184,28 @@ async def agree(ctx, member: discord.Member):
 			await ctx.author.add_roles(recruitRoleID)
 			await bot.newsChannel.send(
 				"@everyone please welcome <@!{}> to the clan! Referred by <@!{}>".format(ctx.author.id, member.id))
-			await modLog("Agreement", "<@!{}> has agreed to the handbook. Referred by {}"
+			await modLog("Agreement", "<@!{}> has agreed to the rules. Referred by {}"
 			             .format(ctx.author.id, member.display_name), ctx)
 		else:
 			await ctx.channel.send(
-				"Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
+				"Please mention the member that referred you by using `/agree @name` where `name` is their Discord name.")
 
 
 @agree.error
 async def agree_error(ctx, error):
 	if isinstance(error, commands.BadArgument):
 		await ctx.channel.send(
-			"Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
+			"Please mention the member that referred you by using `/agree @name` where `name` is their Discord name.")
 		return
 
 	if isinstance(error, commands.MissingRequiredArgument):
 		await ctx.channel.send(
-			"Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
+			"Please mention the member that referred you by using `/agree @name` where `name` is their Discord name.")
 		return
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
+@commands.has_any_role('MODERATOR')
 async def recruit(ctx, member: discord.Member):
 	"""This can be called to manually recruit new members"""
 
@@ -213,14 +215,14 @@ async def recruit(ctx, member: discord.Member):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
+@commands.has_any_role('MODERATOR')
 async def promote(ctx, member: discord.Member):
 	"""This can be called to manually promote members"""
 
 	currentRole = member.top_role
 	if currentRole.name != 'Owner' and member.display_name != '@everyone':
-		newRoleNumber = legionRoles.index(currentRole.name) + 1
-		newRoleName = legionRoles[newRoleNumber]
+		newRoleNumber = foundationRoles.index(currentRole.name) + 1
+		newRoleName = foundationRoles[newRoleNumber]
 
 		# Remove all roles and replace with the new one
 		newRoleID = discord.utils.get(ctx.guild.roles, name=newRoleName)
@@ -242,7 +244,7 @@ async def promote(ctx, member: discord.Member):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
+@commands.has_any_role('MODERATOR')
 async def kick(ctx, member: discord.Member):
 	"""This is used to remove players from the clan and members list"""
 
@@ -253,7 +255,7 @@ async def kick(ctx, member: discord.Member):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
+@commands.has_any_role('MODERATOR')
 async def names(ctx):
 	"""Will send a list of all current members in the discord"""
 
@@ -270,7 +272,7 @@ async def names(ctx):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
+@commands.has_any_role('MODERATOR')
 async def ranks(ctx):
 	"""Will send a list of all current members and their ranks"""
 
@@ -407,7 +409,7 @@ async def price(ctx, *, itemName: str):
 
 
 @bot.command()
-@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
+@commands.has_any_role('MODERATOR')
 async def createVote(ctx, *skillList):
 	"""Create a Skill of the Week (SotW) vote"""
 
@@ -438,4 +440,4 @@ async def createVote(ctx, *skillList):
 	await ctx.message.delete()
 
 
-bot.run(legionToken)
+bot.run(foundationToken)
