@@ -20,8 +20,8 @@ bot.remove_command("help")
 
 # List of members, list of roles, list of colors, and list of stat names
 membersList = []
-foundationRoles = ['Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General', 'MODERATOR']
-foundationColors = [0x99aab5, 0xf1c40f, 0xe67e22, 0x9b59b6, 0x992d22, 0x3498db, 0xad1457]
+foundationRoles = ['Smiley', 'Recruit', 'Corporal', 'Sergeant', 'Lieutenant', 'Captain', 'General']
+foundationColors = [0x11806a, 0x25c059, 0x277ecd, 0xd7342a, 0xe67e22, 0x71368a, 0xf1c40f]
 statNames = ['Overall', 'Attack', 'Defence', 'Strength', 'Hitpoints', 'Ranged', 'Prayer', 'Magic', 'Cooking',
              'Woodcutting', 'Fletching', 'Fishing', 'Firemaking', 'Crafting', 'Smithing', 'Mining', 'Herblore',
              'Agility', 'Thieving', 'Slayer', 'Farming', 'Runecrafting', 'Hunter', 'Construction']
@@ -180,8 +180,8 @@ async def agree(ctx, member: discord.Member):
 
 	if ctx.channel == bot.agreeChannel:
 		if member is not None and member.top_role.name is not "@everyone" and member.top_role.name is not "@here":
-			recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
-			await ctx.author.add_roles(recruitRoleID)
+			smileyRoleID = discord.utils.get(ctx.guild.roles, name="Smiley")
+			await ctx.author.add_roles(smileyRoleID)
 			await bot.newsChannel.send(
 				"@everyone please welcome <@!{}> to the clan! Referred by <@!{}>".format(ctx.author.id, member.id))
 			await modLog("Agreement", "<@!{}> has agreed to the rules. Referred by {}"
@@ -209,8 +209,8 @@ async def agree_error(ctx, error):
 async def recruit(ctx, member: discord.Member):
 	"""This can be called to manually recruit new members"""
 
-	recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
-	await member.add_roles(recruitRoleID)
+	smileyRoleID = discord.utils.get(ctx.guild.roles, name="Smiley")
+	await member.add_roles(smileyRoleID)
 	await bot.newsChannel.send("@everyone please welcome <@!%s> to the clan!" % member.id)
 
 
