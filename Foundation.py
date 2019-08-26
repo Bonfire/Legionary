@@ -167,11 +167,10 @@ async def on_member_update(oldMemberInfo: discord.Member, newMemberInfo: discord
 			             .format(oldMemberInfo.display_name, newMemberInfo.id))
 
 	if oldMemberInfo.top_role != newMemberInfo.top_role:
-		if oldMemberInfo.top_role.name != '@everyone':
-			removeMember(oldMemberInfo)
-			addMember(newMemberInfo)
-			await modLog("Rank Change", "<@!{}> had their rank changed from {} to {}"
-			             .format(oldMemberInfo.id, oldMemberInfo.top_role.name, newMemberInfo.top_role.name))
+		removeMember(oldMemberInfo)
+		addMember(newMemberInfo)
+		await modLog("Rank Change", "<@!{}> had their rank changed from {} to {}"
+		             .format(oldMemberInfo.id, oldMemberInfo.top_role.name, newMemberInfo.top_role.name))
 
 
 @bot.command()
@@ -179,7 +178,7 @@ async def agree(ctx, member: discord.Member):
 	"""This will recruit new members once they've agreed to the handbook"""
 
 	if ctx.channel == bot.agreeChannel:
-		if member is not None and member.top_role.name is not "@everyone" and member.top_role.name is not "@here":
+		if member is not None and member.top_role.name is not "@here":
 			smileyRoleID = discord.utils.get(ctx.guild.roles, name="Smiley")
 			await ctx.author.add_roles(smileyRoleID)
 			await bot.newsChannel.send(
@@ -262,7 +261,7 @@ async def names(ctx):
 	with open("Names.txt", "w+") as namesFile:
 		members = ctx.guild.members
 		for person in members:
-			if person.bot is False and person.top_role.name != "Guest" and person.top_role.name != "@everyone":
+			if person.bot is False:
 				namesFile.write(person.display_name + "\n")
 	namesFile.close()
 	await ctx.message.channel.send(file=discord.File("Names.txt"))
@@ -280,11 +279,10 @@ async def ranks(ctx):
 		roles = ctx.guild.roles
 		members = ctx.guild.members
 		for role in roles:
-			if role.name is not "Guest" and role.name != "@everyone":
-				for member in members:
-					if member.top_role == role and member.bot is False:
-						ranksFile.write(
-							"{:<20} {:^20} {:>20}\n".format(member.display_name, role.name, str(member.joined_at)))
+			for member in members:
+				if member.top_role == role and member.bot is False:
+					ranksFile.write(
+						"{:<20} {:^20} {:>20}\n".format(member.display_name, role.name, str(member.joined_at)))
 	ranksFile.close()
 	await ctx.message.channel.send(file=discord.File("Ranks.txt"))
 	os.remove("Ranks.txt")
