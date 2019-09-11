@@ -44,7 +44,7 @@ async def on_ready():
 			for member in server.members:
 				addMember(member)
 
-	bot.logChannel = bot.get_channel(615027803322187776)
+	bot.logChannel = bot.get_channel(617536973015482377)
 	bot.newsChannel = bot.get_channel(608027673213534256)
 	bot.agreeChannel = bot.get_channel(615028010751492145)
 
