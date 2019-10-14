@@ -405,37 +405,4 @@ async def price(ctx, *, itemName: str):
 			else:
 				await ctx.channel.send("Item not found!")
 
-
-@bot.command()
-@commands.has_any_role('Captain', 'Leader', 'General', 'General Emeritus')
-async def createVote(ctx, *skillList):
-	"""Create a Skill of the Week (SotW) vote"""
-
-	currentDate = datetime.now()
-	datePlusWeek = currentDate + timedelta(days=7)
-	currentDatePair = currentDate.strftime("%b") + " " + currentDate.strftime("%d")
-	datePlusWeekPair = datePlusWeek.strftime("%b") + " " + datePlusWeek.strftime("%d")
-
-	votingAnnouncement = """
-	@everyone [Skill of the Week]\n\nPlease vote for your favorite skills for the week of {} - {} skilling event! This event will start on {} at 12:00 PM EST, and end at {} at 12:00 AM EST. To vote for a skill, simply use one of the reactions below that correspond to that particular choice. **You're welcome to vote for more than one skill.** Whichever skill is most voted for by event start time will become the Skill of the Week. Those who earn the most XP in the selected skill by the end of the event will earn 1m for 3rd place, 1.5m for 2nd place, and 2.5m for 1st place. Voting will close when the event starts.
-```
-1. {}
-2. {}
-3. {}
-4. {}
-5. {}
-6. {}
-7. {}
-8. {}
-9. {}
-```
-	""".format(currentDatePair, datePlusWeekPair, currentDatePair, datePlusWeekPair,
-	           skillList[0], skillList[1], skillList[2], skillList[3], skillList[4],
-	           skillList[5], skillList[6], skillList[7], skillList[8])
-
-	announcementMessage = await ctx.channel.send(votingAnnouncement)
-	[await announcementMessage.add_reaction("{}\N{COMBINING ENCLOSING KEYCAP}".format(num)) for num in range(1, 10)]
-	await ctx.message.delete()
-
-
 bot.run(legionToken)
