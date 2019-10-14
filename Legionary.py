@@ -177,7 +177,7 @@ async def agree(ctx, member: discord.Member):
 	"""This will recruit new members once they've agreed to the handbook"""
 
 	if ctx.channel == bot.agreeChannel:
-		if member is not None and member.top_role.name is not "@everyone" and member.top_role.name is not "@here":
+		if member is not None and member.top_role.name is not "@everyone" and member.top_role.name is not "@here" and member is not ctx.author:
 			recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
 			await ctx.author.add_roles(recruitRoleID)
 			await bot.newsChannel.send(
