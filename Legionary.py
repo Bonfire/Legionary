@@ -1,7 +1,8 @@
+import asyncio
 import json
 import os
 import platform
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import aiohttp
 import discord
@@ -170,6 +171,48 @@ async def on_member_update(oldMemberInfo: discord.Member, newMemberInfo: discord
 			addMember(newMemberInfo)
 			await modLog("Rank Change", "<@!{}> had their rank changed from {} to {}"
 			             .format(oldMemberInfo.id, oldMemberInfo.top_role.name, newMemberInfo.top_role.name))
+
+
+async def anniversaryCheck():
+	while True:
+		await bot.wait_until_ready()
+
+		for server in bot.guilds:
+			if server.name == "Lost Legion":
+				bot.newsChannel = bot.get_channel(515684275580960769)
+				oneMonthRoleID = discord.utils.get(server.roles, name="1 Month")
+				threeMonthsRoleID = discord.utils.get(server.roles, name="3 Months")
+				sixMonthsRoleID = discord.utils.get(server.roles, name="6 Months")
+				oneYearRoleID = discord.utils.get(server.roles, name="1 Year")
+
+				members = server.members
+				currentDateTime = datetime.today()
+				for member in members:
+					memberRoles = member.roles
+					memberJoinDate = member.joined_at
+					timeDelta = abs(currentDateTime - memberJoinDate)
+					daysSinceJoining = timeDelta.days
+
+					if (daysSinceJoining == 30):
+						await bot.newsChannel.send(
+							"[Anniversary] Today is <@!{}>'s 1 month Lost Legion anniversary!".format(member.id))
+						await member.add_roles(oneMonthRoleID)
+					elif (daysSinceJoining == 90):
+						await bot.newsChannel.send(
+							"[Anniversary] Today is <@!{}>'s 3 month Lost Legion anniversary!".format(member.id))
+						await member.remove_roles(roles=[oneMonthRoleID])
+						await member.add_roles(threeMonthsRoleID)
+					elif (daysSinceJoining == 180):
+						await bot.newsChannel.send(
+							"[Anniversary] Today is <@!{}>'s 6 month Lost Legion anniversary!".format(member.id))
+						await member.remove_roles(roles=[threeMonthsRoleID])
+						await member.add_roles(sixMonthsRoleID)
+					elif (daysSinceJoining == 360):
+						await bot.newsChannel.send(
+							"[Anniversary] Today is <@!{}>'s 1 year Lost Legion anniversary!".format(member.id))
+						await member.remove_roles(roles=[sixMonthsRoleID])
+						await member.add_roles(oneYearRoleID)
+		await asyncio.sleep(86400)  # Task runs once a day
 
 
 @bot.command()
@@ -405,4 +448,6 @@ async def price(ctx, *, itemName: str):
 			else:
 				await ctx.channel.send("Item not found!")
 
+
+bot.loop.create_task(anniversaryCheck())
 bot.run(legionToken)
