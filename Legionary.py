@@ -188,7 +188,6 @@ async def anniversaryCheck():
 				members = server.members
 				currentDateTime = datetime.today()
 				for member in members:
-					memberRoles = member.roles
 					memberJoinDate = member.joined_at
 					timeDelta = abs(currentDateTime - memberJoinDate)
 					daysSinceJoining = timeDelta.days
