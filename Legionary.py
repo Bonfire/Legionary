@@ -200,19 +200,19 @@ async def anniversaryCheck():
 						await bot.newsChannel.send(
 							"[Anniversary] Today is <@!{}>'s 3 month Lost Legion anniversary! Wish them a happy anniversary!".format(member.id))
 						if(oneMonthRoleID in member.roles):
-							await member.remove_roles([oneMonthRoleID])
+							await member.remove_roles(oneMonthRoleID)
 						await member.add_roles(threeMonthsRoleID)
 					elif (daysSinceJoining == 180):
 						await bot.newsChannel.send(
 							"[Anniversary] Today is <@!{}>'s 6 month Lost Legion anniversary! Wish them a happy anniversary!".format(member.id))
 						if (threeMonthsRoleID in member.roles):
-							await member.remove_roles([threeMonthsRoleID])
+							await member.remove_roles(threeMonthsRoleID)
 						await member.add_roles(sixMonthsRoleID)
 					elif (daysSinceJoining == 360):
 						await bot.newsChannel.send(
 							"[Anniversary] Today is <@!{}>'s 1 year Lost Legion anniversary! Wish them a happy anniversary!".format(member.id))
 						if(sixMonthsRoleID in member.roles):
-							await member.remove_roles([sixMonthsRoleID])
+							await member.remove_roles(sixMonthsRoleID)
 						await member.add_roles(oneYearRoleID)
 		await asyncio.sleep(86400)  # Task runs once a day
 
