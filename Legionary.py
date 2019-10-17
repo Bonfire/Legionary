@@ -272,10 +272,10 @@ async def promote(ctx, member: discord.Member):
 
 		# Make sure we give the higher roles their moderator statuses
 		if newRoleName == 'Lieutenant':
-			modRoleID = discord.utils.get(ctx.guild.roles, name="Moderator")
+			modRoleID = discord.utils.get(ctx.guild.roles, name="Leadership")
 			await member.edit(roles=[newRoleID, modRoleID])
-		elif newRoleName == 'General' or newRoleName == 'Captain':
-			globalRoleID = discord.utils.get(ctx.guild.roles, name="Global Moderator")
+		elif newRoleName == 'General' or newRoleName == 'Captain' or newRoleName == 'General Emeritus':
+			globalRoleID = discord.utils.get(ctx.guild.roles, name="Staff")
 			await member.edit(roles=[newRoleID, globalRoleID])
 		else:
 			await member.edit(roles=[newRoleID])
