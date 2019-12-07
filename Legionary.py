@@ -193,8 +193,6 @@ async def anniversaryCheck():
 					daysSinceJoining = timeDelta.days
 
 					if (daysSinceJoining == 30):
-						await bot.newsChannel.send(
-							"[Anniversary] Today is <@!{}>'s 1 month Lost Legion anniversary! Wish them a happy anniversary!".format(member.id))
 						await member.add_roles(oneMonthRoleID)
 					elif (daysSinceJoining == 90):
 						await bot.newsChannel.send(
@@ -449,7 +447,6 @@ async def price(ctx, *, itemName: str):
 				await ctx.channel.send(embed=itemPriceEmbed)
 			else:
 				await ctx.channel.send("Item not found!")
-
 
 bot.loop.create_task(anniversaryCheck())
 bot.run(legionToken)
