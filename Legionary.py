@@ -229,13 +229,14 @@ async def agree(ctx, member: discord.Member, *RSN):
 				and member.top_role.name is not "@here" \
 				and member is not ctx.author \
 				and RSN is not None:
+			strippedRSN = RSN.strip()
 			recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
-			await ctx.author.edit(nick=RSN)
+			await ctx.author.edit(nick=strippedRSN)
 			await ctx.author.add_roles(recruitRoleID)
 			await bot.newsChannel.send(
-				"@everyone please welcome <@!{}> to the clan, referred by <@!{}>! Their RSN is {}".format(ctx.author.id, member.id, RSN))
+				"@everyone please welcome <@!{}> to the clan, referred by <@!{}>! Their RSN is {}".format(ctx.author.id, member.id, strippedRSN))
 			await modLog("Agreement", "<@!{}> has agreed to the handbook, referred by {} with RSN {}"
-			             .format(ctx.author.id, member.display_name, RSN), ctx)
+			             .format(ctx.author.id, member.display_name, strippedRSN), ctx)
 		else:
 			await ctx.channel.send(
 				"Please be sure to mention the person that _referred you_ and your RSN when agreeing. An example of this would be `!agree @Bonf#7654 MyName`, where `@Bonf#7654` is the person who referred you and `MyName` is your in-game name.")
