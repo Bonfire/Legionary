@@ -220,7 +220,7 @@ async def anniversaryCheck():
 
 
 @bot.command()
-async def agree(ctx, member: discord.Member, RSN):
+async def agree(ctx, member: discord.Member, *RSN):
 	"""This will recruit new members once they've agreed to the handbook"""
 
 	if ctx.channel == bot.agreeChannel:
