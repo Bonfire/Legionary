@@ -46,6 +46,7 @@ async def on_ready():
 	bot.logChannel = bot.get_channel(515702280063025171)
 	bot.newsChannel = bot.get_channel(515684275580960769)
 	bot.agreeChannel = bot.get_channel(515688016207937585)
+	bot.pollsChannel = bot.get_channel(654476005926371328)
 
 
 @bot.command()
@@ -133,7 +134,7 @@ async def on_member_join(user: discord.User):
 	                           value="Verify that you have changed your name on the server to your in-game name",
 	                           inline=False)
 	recruitmentEmbed.add_field(name="4. Agree to The Handbook",
-	                           value="Type `!agree @name` (where `name` is the name of the member who referred you) in the <#515688016207937585> channel when you have changed your name and agree to The Handbook.",
+	                           value="Type `!agree @name RSN` (where `name` is the Discord tag of the member who referred you, and `RSN` is your in-game name) in the <#515688016207937585> channel. Do this when you have changed your name and agree to The Handbook.",
 	                           inline=False)
 	recruitmentEmbed.set_footer(text="Questions? Please contact the person who added you to our server or Bonf!")
 	await user.send(embed=recruitmentEmbed)
@@ -196,52 +197,60 @@ async def anniversaryCheck():
 						await member.add_roles(oneMonthRoleID)
 					elif (daysSinceJoining == 90):
 						await bot.newsChannel.send(
-							"[Anniversary] Today is <@!{}>'s 3 month Lost Legion anniversary! Wish them a happy anniversary!".format(member.id))
-						if(oneMonthRoleID in member.roles):
+							"[Anniversary] Today is <@!{}>'s 3 month Lost Legion anniversary! Wish them a happy anniversary!".format(
+								member.id))
+						if (oneMonthRoleID in member.roles):
 							await member.remove_roles(oneMonthRoleID)
 						await member.add_roles(threeMonthsRoleID)
 					elif (daysSinceJoining == 180):
 						await bot.newsChannel.send(
-							"[Anniversary] Today is <@!{}>'s 6 month Lost Legion anniversary! Wish them a happy anniversary!".format(member.id))
+							"[Anniversary] Today is <@!{}>'s 6 month Lost Legion anniversary! Wish them a happy anniversary!".format(
+								member.id))
 						if (threeMonthsRoleID in member.roles):
 							await member.remove_roles(threeMonthsRoleID)
 						await member.add_roles(sixMonthsRoleID)
 					elif (daysSinceJoining == 360):
 						await bot.newsChannel.send(
-							"[Anniversary] Today is <@!{}>'s 1 year Lost Legion anniversary! Wish them a happy anniversary!".format(member.id))
-						if(sixMonthsRoleID in member.roles):
+							"[Anniversary] Today is <@!{}>'s 1 year Lost Legion anniversary! Wish them a happy anniversary!".format(
+								member.id))
+						if (sixMonthsRoleID in member.roles):
 							await member.remove_roles(sixMonthsRoleID)
 						await member.add_roles(oneYearRoleID)
 		await asyncio.sleep(86400)  # Task runs once a day
 
 
 @bot.command()
-async def agree(ctx, member: discord.Member):
+async def agree(ctx, member: discord.Member, RSN):
 	"""This will recruit new members once they've agreed to the handbook"""
 
 	if ctx.channel == bot.agreeChannel:
-		if member is not None and member.top_role.name is not "@everyone" and member.top_role.name is not "@here" and member is not ctx.author:
+		if member is not None \
+				and member.top_role.name is not "@everyone" \
+				and member.top_role.name is not "@here" \
+				and member is not ctx.author \
+				and RSN is not None:
 			recruitRoleID = discord.utils.get(ctx.guild.roles, name="Recruit")
+			await ctx.author.edit(nick=RSN)
 			await ctx.author.add_roles(recruitRoleID)
 			await bot.newsChannel.send(
-				"@everyone please welcome <@!{}> to the clan! Referred by <@!{}>".format(ctx.author.id, member.id))
-			await modLog("Agreement", "<@!{}> has agreed to the handbook. Referred by {}"
-			             .format(ctx.author.id, member.display_name), ctx)
+				"@everyone please welcome <@!{}> to the clan, referred by <@!{}>! Their RSN is {}".format(ctx.author.id, member.id, RSN))
+			await modLog("Agreement", "<@!{}> has agreed to the handbook, referred by {} with RSN {}"
+			             .format(ctx.author.id, member.display_name, RSN), ctx)
 		else:
 			await ctx.channel.send(
-				"Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
+				"Please be sure to mention the person that _referred you_ and your RSN when agreeing. An example of this would be `!agree @Bonf#7654 MyName`, where `@Bonf#7654` is the person who referred you and `MyName` is your in-game name.")
 
 
 @agree.error
 async def agree_error(ctx, error):
 	if isinstance(error, commands.BadArgument):
 		await ctx.channel.send(
-			"Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
+			"Please be sure to mention the person that _referred you_ and your RSN when agreeing. An example of this would be `!agree @Bonf#7654 MyName`, where `@Bonf#7654` is the person who referred you and `MyName` is your in-game name.")
 		return
 
 	if isinstance(error, commands.MissingRequiredArgument):
 		await ctx.channel.send(
-			"Please mention the member that referred you by using `!agree @name` where `name` is their Discord name.")
+			"Please be sure to mention the person that _referred you_ and your RSN when agreeing. An example of this would be `!agree @Bonf#7654 MyName`, where `@Bonf#7654` is the person who referred you and `MyName` is your in-game name.")
 		return
 
 
@@ -447,6 +456,7 @@ async def price(ctx, *, itemName: str):
 				await ctx.channel.send(embed=itemPriceEmbed)
 			else:
 				await ctx.channel.send("Item not found!")
+
 
 bot.loop.create_task(anniversaryCheck())
 bot.run(legionToken)
